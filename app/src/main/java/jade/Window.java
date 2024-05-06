@@ -5,6 +5,8 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import util.Time;
+
 import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
@@ -20,19 +22,36 @@ public class Window {
     private long glfwWindow;
     private int width, height;
 
-    private MouseListener mouseListener;
+    public static float[] fillColor = new float[] { 1.0f, 0.0f, 0.0f, 0.0f };
+
+    private static Scene currentScene;
 
     private Window() {
         this.width = 800;
         this.height = 600;
-        this.mouseListener = MouseListener.get();
     }
 
     public static Window get() {
         if (Window.window == null) {
             Window.window = new Window();
+            Window.currentScene = new LevelEditorScene();
         }
         return Window.window;
+    }
+
+    public static void changeScene(int newSceneIndex) {
+        switch (newSceneIndex) {
+            case 0:
+                Window.currentScene = new LevelEditorScene();
+                break;
+            case 1:
+                Window.currentScene = new LevelScene();
+                break;
+
+            default:
+                throw new IllegalArgumentException("Invalid scene index");
+
+        }
     }
 
     @SuppressWarnings("null")
@@ -56,20 +75,13 @@ public class Window {
         if (this.glfwWindow == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
-        // Setup a key callback. It will be called every time a key is pressed, repeated
-        // or released.
-        glfwSetKeyCallback(this.glfwWindow, (glfwWindow, key, scancode, action, mods) -> {
-            System.out.println("Key: " + key + " Scancode: " + scancode + " Action: " + action + " Mods: " + mods);
-            /*
-             * key: codigo da tecla
-             * scancode: codigo da tecla tbm?
-             * action: 1 = press, 0 = release, 2 = hold
-             * mods: 1 = shift, 2 = ctrl, 4 = alt, 8 = super
-             */
-
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                glfwSetWindowShouldClose(glfwWindow, true); // We will detect this in the rendering loop
-        });
+        /*
+         * key: codigo da tecla
+         * scancode: codigo da tecla tbm?
+         * action: 1 = press, 0 = release, 2 = hold
+         * mods: 1 = shift, 2 = ctrl, 4 = alt, 8 = super
+         */
+        glfwSetKeyCallback(this.glfwWindow, KeyEventListener::keyCallback);
 
         glfwSetCursorPosCallback(this.glfwWindow, MouseListener::mousePosCallback);
         glfwSetMouseButtonCallback(this.glfwWindow, MouseListener::mouseButtonCallback);
@@ -100,6 +112,8 @@ public class Window {
 
         // Make the window visible
         glfwShowWindow(this.glfwWindow);
+
+        Scene.start(0);
     }
 
     private void loop() {
@@ -111,18 +125,31 @@ public class Window {
         GL.createCapabilities();
 
         // Set the clear color
-        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
-
+        // glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
+        double lastTime = Time.getTime();
+        double deltaTime = -1.0f;
         while (!glfwWindowShouldClose(this.glfwWindow)) {
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+            glfwPollEvents();
+            
+            glClearColor(Window.fillColor[0], Window.fillColor[1], Window.fillColor[2], Window.fillColor[3]);
 
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+            
             glfwSwapBuffers(this.glfwWindow); // swap the color buffers
 
             // Poll for window events. The key callback above will only be
             // invoked during this call.
-            glfwPollEvents();
+
+            if (deltaTime >= 0) {
+                Window.currentScene.update((float) (deltaTime));
+            }
+
+            deltaTime = Time.getTime() - lastTime;
+            lastTime = Time.getTime();
+            
         }
     }
 

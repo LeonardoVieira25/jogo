@@ -1,5 +1,6 @@
 package jade;
 
+
 public class MouseListener {
     private static MouseListener instance;
     private double scrollX, scrollY;
@@ -29,8 +30,6 @@ public class MouseListener {
         get().xPos = xPos;
         get().yPos = yPos;
         get().isDragging = get().mouseButtonPressed[0] || get().mouseButtonPressed[1] || get().mouseButtonPressed[2];
-
-        System.out.println("X: " + xPos + " Y: " + yPos +  " Dragging: " + get().isDragging);
     }
 
     public static void mouseButtonCallback(long window, int button, int action, int mods) {
@@ -44,14 +43,20 @@ public class MouseListener {
                 get().isDragging = false;
             }
         }
-        System.out.println("Button: " + button + " action: " + action);
     }
 
     public static void mouseScrollCallback(long window, double xOffset, double yOffset) {
         get().scrollX = xOffset;
         get().scrollY = yOffset;
 
-        System.out.println("Scroll X: " + xOffset + " Scroll Y: " + yOffset);
+    }
+
+    public static boolean isMouseButtonDown(int button) {
+        if (button < get().mouseButtonPressed.length) {
+            return get().mouseButtonPressed[button];
+        } else {
+            return false;
+        }
     }
 
     public static double getX() {
