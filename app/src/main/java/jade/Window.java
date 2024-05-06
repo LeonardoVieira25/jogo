@@ -71,16 +71,9 @@ public class Window {
                 glfwSetWindowShouldClose(glfwWindow, true); // We will detect this in the rendering loop
         });
 
-        glfwSetCursorPosCallback(this.glfwWindow,
-                (glfwWindow, xPos, yPos) -> MouseListener.mousePosCallback(glfwWindow, xPos, yPos));
-        glfwSetMouseButtonCallback(
-                this.glfwWindow,
-                (glfwWindow, button, action, mods) -> MouseListener.mouseButtonCallback(
-                        glfwWindow, button, action, mods));
-
-        glfwSetScrollCallback(
-                this.glfwWindow,
-                (glfwWindow, xOffset, yOffset) -> MouseListener.mouseScrollCallback(glfwWindow, xOffset, yOffset));
+        glfwSetCursorPosCallback(this.glfwWindow, MouseListener::mousePosCallback);
+        glfwSetMouseButtonCallback(this.glfwWindow, MouseListener::mouseButtonCallback);
+        glfwSetScrollCallback(this.glfwWindow, MouseListener::mouseScrollCallback);
 
         // Get the thread stack and push a new frame
         try (MemoryStack stack = stackPush()) {
