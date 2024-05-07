@@ -2,16 +2,22 @@ package jade;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 
+import org.joml.Vector2d;
+
 public class LevelEditorScene extends Scene {
 
 
 
 
     public LevelEditorScene() {
-
         Scene.sceneFillColor = new float[] { 0.0f, 0.0f, 1.0f, 0.0f };
         System.out.println("LevelEditorScene");
-
+    }
+    
+    @Override
+    public void init() {
+        super.init();
+        camera.setPosition(new Vector2d(100.0f, 0.0f));
     }
 
     

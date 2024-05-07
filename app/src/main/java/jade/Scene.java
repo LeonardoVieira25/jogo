@@ -1,5 +1,7 @@
 package jade;
 
+import org.joml.Vector2d;
+
 import renderer.Shader;
 
 public abstract class Scene {
@@ -18,10 +20,13 @@ public abstract class Scene {
 
 
     private Shader shader = null;
+    protected Camera camera = null;
 
 
     public void init() {
         shader = new Shader("assets/shaders/default.glsl");
+        this.camera = new Camera(new Vector2d(0,0));
+        shader.setCamera(this.camera);
     }
 
     public Scene() {

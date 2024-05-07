@@ -10,8 +10,29 @@ import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
+import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20.GL_INFO_LOG_LENGTH;
+import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+import static org.lwjgl.opengl.GL20.glAttachShader;
+import static org.lwjgl.opengl.GL20.glCompileShader;
+import static org.lwjgl.opengl.GL20.glCreateProgram;
+import static org.lwjgl.opengl.GL20.glCreateShader;
+import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
+import static org.lwjgl.opengl.GL20.glGetProgrami;
+import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
+import static org.lwjgl.opengl.GL20.glGetShaderi;
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
+import static org.lwjgl.opengl.GL20.glLinkProgram;
+import static org.lwjgl.opengl.GL20.glShaderSource;
+import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+import static org.lwjgl.opengl.GL20.glUseProgram;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -19,9 +40,13 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import org.joml.Matrix4d;
 import org.lwjgl.BufferUtils;
 
+import jade.Camera;
+
 public class Shader {
+    private Camera camera;
     private String filepath;
 
     private int vertexID;
@@ -32,10 +57,10 @@ public class Shader {
 
     private float[] vertexArray = {
             // positions // colors
-            0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // Bottom right 0
-            -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // Top left 1
-            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // Top right 2
-            -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, // Bottom left 3
+            1000.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // Bottom right 0
+            0.0f, 1000.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // Top left 1
+            1000.0f, 1000.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // Top right 2
+            0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, // Bottom left 3
     };
     private int[] elementArray = {
             2, 1, 0, // top right triangle
@@ -56,6 +81,10 @@ public class Shader {
         this.programID = createProgram();
 
         sendBuffers();
+    }
+
+    public void setCamera(Camera camera) {
+        this.camera = camera;
     }
 
     public int getShaderProgram() {
@@ -148,6 +177,9 @@ public class Shader {
     }
 
     public void render() {
+        uploadMatrix4f("uProjection", camera.getProjectionMatrix());
+        uploadMatrix4f("uView", camera.getViewMatrix());
+
         glBindVertexArray(vaoID);
 
         // Enable the vertex attribute pointers
@@ -162,4 +194,17 @@ public class Shader {
 
         glBindVertexArray(0);
     }
+
+    public void uploadMatrix4f(String name, Matrix4d matrix) {
+        int location = glGetUniformLocation(this.programID, name);
+        FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16); //? 4x4 matrix
+        matrix.get(matrixBuffer);
+
+        glUniformMatrix4fv(
+            location, //? localização da variável uniforme 
+            false, //? se a matriz deve ser transposta?
+            matrixBuffer //? o buffer que vai ser enviado para a GPU
+            ); 
+    }
+
 }
