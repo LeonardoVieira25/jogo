@@ -1,7 +1,5 @@
 package jade;
 
-import org.joml.Vector2d;
-
 public class LevelScene extends Scene {
 
     public LevelScene() {
@@ -12,7 +10,7 @@ public class LevelScene extends Scene {
     @Override
     public void init() {
         super.init();
-        camera.setPosition(new Vector2d(0.0f, 0.0f));
+        // camera.setPosition(new Vector2d(0.0f, 0.0f));
     }
     
     @Override

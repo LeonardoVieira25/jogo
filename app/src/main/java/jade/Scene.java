@@ -1,8 +1,13 @@
 package jade;
 
+import static org.lwjgl.opengl.GL11.GL_TEXTURE;
+
 import org.joml.Vector2d;
 
 import renderer.Shader;
+import renderer.Texture;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0; // Add this import statement
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 
 public abstract class Scene {
 
@@ -22,11 +27,17 @@ public abstract class Scene {
     private Shader shader = null;
     protected Camera camera = null;
 
+    private Texture texture = null;
+
 
     public void init() {
         shader = new Shader("assets/shaders/default.glsl");
         this.camera = new Camera(new Vector2d(0,0));
         shader.setCamera(this.camera);
+
+        texture = new Texture("assets/sprites/gato_de_terno.jpg");
+        
+        
     }
 
     public Scene() {
@@ -56,7 +67,13 @@ public abstract class Scene {
     public void update(float deltaTime) {
 
         shader.use();
+
+        shader.uploadTexture("tex", 0);
+        glActiveTexture(GL_TEXTURE0);
+        texture.bind();
+        
         shader.render();
+        
         shader.detach();
 
         if (switchingScene) {

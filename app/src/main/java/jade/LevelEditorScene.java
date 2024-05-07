@@ -2,7 +2,6 @@ package jade;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 
-import org.joml.Vector2d;
 
 public class LevelEditorScene extends Scene {
 
@@ -17,7 +16,7 @@ public class LevelEditorScene extends Scene {
     @Override
     public void init() {
         super.init();
-        camera.setPosition(new Vector2d(100.0f, 0.0f));
+        // camera.setPosition(new Vector2d(100.0f, 0.0f));
     }
 
     

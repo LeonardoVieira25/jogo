@@ -28,6 +28,8 @@ import static org.lwjgl.opengl.GL20.glGetShaderi;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glShaderSource;
+import static org.lwjgl.opengl.GL20.glUniform1f;
+import static org.lwjgl.opengl.GL20.glUniform1i;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
@@ -44,6 +46,7 @@ import org.joml.Matrix4d;
 import org.lwjgl.BufferUtils;
 
 import jade.Camera;
+import util.Time;
 
 public class Shader {
     private Camera camera;
@@ -53,14 +56,16 @@ public class Shader {
     private int fragmentID;
     private int programID;
 
+    private boolean beingUsed = false;
+
     private int vaoID, vboID, eboID;
 
     private float[] vertexArray = {
-            // positions // colors
-            1000.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // Bottom right 0
-            0.0f, 1000.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // Top left 1
-            1000.0f, 1000.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // Top right 2
-            0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, // Bottom left 3
+            // positions--------- colors----------------- uv coordinates
+            400.0f, 100.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1, 0, // Bottom right 0
+            100.0f, 400.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0, 1, // Top left 1
+            400.0f, 400.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1, 1, // Top right 2
+            100.0f, 100.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0, 0 // Bottom left 3
     };
     private int[] elementArray = {
             2, 1, 0, // top right triangle
@@ -144,11 +149,17 @@ public class Shader {
     }
 
     public void use() {
-        glUseProgram(this.programID);
+        if (!beingUsed) {
+            glUseProgram(this.programID);
+            beingUsed = true;
+        }
     }
 
     public void detach() {
-        glUseProgram(0);
+        if (beingUsed) {
+            glUseProgram(0);
+            beingUsed = false;
+        }
     }
 
     public void sendBuffers() {
@@ -169,16 +180,30 @@ public class Shader {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 7 * Float.BYTES, 0);
+        int positionsSize = 3;
+        int colorSize = 4;
+        int uvSize = 2;
+
+        // glVertexAttribPointer(0, 3, GL_FLOAT, false, 7 * Float.BYTES, 0);
+        glVertexAttribPointer(0, positionsSize, GL_FLOAT, false, (positionsSize + colorSize + uvSize) * Float.BYTES, 0);
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 4, GL_FLOAT, false, 7 * Float.BYTES, 3 * Float.BYTES);
+        // glVertexAttribPointer(1, 4, GL_FLOAT, false, 7 * Float.BYTES, 3 *
+        // Float.BYTES);
+
+        glVertexAttribPointer(1, colorSize, GL_FLOAT, false, (positionsSize + colorSize + uvSize) * Float.BYTES,
+                positionsSize * Float.BYTES);
         glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, uvSize, GL_FLOAT, false, (positionsSize + colorSize + uvSize) * Float.BYTES,
+                (positionsSize + colorSize) * Float.BYTES);
+        glEnableVertexAttribArray(2);
     }
 
     public void render() {
         uploadMatrix4f("uProjection", camera.getProjectionMatrix());
         uploadMatrix4f("uView", camera.getViewMatrix());
+        uploadFloat("uTime", Time.getTime());
 
         glBindVertexArray(vaoID);
 
@@ -196,15 +221,28 @@ public class Shader {
     }
 
     public void uploadMatrix4f(String name, Matrix4d matrix) {
-        int location = glGetUniformLocation(this.programID, name);
-        FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16); //? 4x4 matrix
-        matrix.get(matrixBuffer);
+        use();
+        int location = glGetUniformLocation(this.programID, name); // ? pega a posição da variável uniforme na GPU
+        FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16); // ? 4x4 matrix
+        matrix.get(matrixBuffer); // ? pega a matriz e coloca no buffer
 
         glUniformMatrix4fv(
-            location, //? localização da variável uniforme 
-            false, //? se a matriz deve ser transposta?
-            matrixBuffer //? o buffer que vai ser enviado para a GPU
-            ); 
+                location, // ? localização da variável uniforme
+                false, // ? se a matriz deve ser transposta?
+                matrixBuffer // ? o buffer que vai ser enviado para a GPU
+        ); // ? envia a matriz para a GPU
     }
 
+    public void uploadFloat(String name, float value) {
+        int location = glGetUniformLocation(this.programID, name);
+        use();
+        glUniform1f(location, value);
+    }
+
+
+    public void uploadTexture(String name, int slot) {
+        int location = glGetUniformLocation(this.programID, name);
+        use();
+        glUniform1i(location, slot);
+    }
 }

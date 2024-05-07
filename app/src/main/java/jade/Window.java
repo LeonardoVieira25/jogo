@@ -46,6 +46,13 @@ public class Window {
 
     private static Scene currentScene;
 
+    public static int getWidth() {
+        return Window.get().width;
+    }
+    public static int getHeigth() {
+        return Window.get().height;
+    }
+
     private Window() {
         this.width = 800;
         this.height = 600;
