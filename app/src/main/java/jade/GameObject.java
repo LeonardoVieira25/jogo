@@ -19,6 +19,9 @@ public class GameObject {
         this.transform = transform;
     }
     
+    public String getName() {
+        return name;
+    }
 
     public <T extends Component> T getComponent(Class<T> componentClass) {
         for (Component component : components) {

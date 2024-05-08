@@ -122,7 +122,7 @@ public class Window {
         glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
         glfwSetKeyCallback(glfwWindow, KeyEventListener::keyCallback);
 
-        // glfwSwapInterval(1); // Enable v-sync ( limita o fps )
+        glfwSwapInterval(1); // Enable v-sync ( limita o fps )
 
         glfwShowWindow(glfwWindow);
 
@@ -162,8 +162,8 @@ public class Window {
         init();
         loop();
 
-        glfwFreeCallbacks(this.glfwWindow);
-        glfwDestroyWindow(this.glfwWindow);
+        glfwFreeCallbacks(Window.glfwWindow);
+        glfwDestroyWindow(Window.glfwWindow);
         glfwTerminate();
         glfwSetErrorCallback(null).free();
     }

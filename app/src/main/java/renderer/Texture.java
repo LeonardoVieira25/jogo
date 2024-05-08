@@ -98,6 +98,13 @@ public class Texture {
 
     }
 
+    public int getTextureID() {
+        return textureID;
+    }
+    public String getPath() {
+        return path;
+    }
+
     public void bind() {
         glBindTexture(GL_TEXTURE_2D, textureID);
     }

@@ -1,6 +1,5 @@
 package components;
 
-import org.joml.Vector4d;
 import org.joml.Vector4f;
 
 import jade.Component;
@@ -12,6 +11,10 @@ public class SpriteRenderer extends Component {
 
     private Texture texture = null;
     private String texturePath = null;
+
+    public String getTexturePath() {
+        return texturePath;
+    }
     public SpriteRenderer(String texturePath, Vector4f color) {
         // System.out.println("SpriteRenderer created!");
         this.texturePath = texturePath;

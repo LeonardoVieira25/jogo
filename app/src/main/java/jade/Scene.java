@@ -1,21 +1,9 @@
 package jade;
 
-import static org.lwjgl.opengl.GL11.GL_TEXTURE;
-
-import org.joml.Vector2d;
-import org.joml.Vector2f;
-import org.joml.Vector4d;
-import org.joml.Vector4f;
-
-import components.SpriteRenderer;
-import renderer.Renderer;
-import renderer.Shader;
-import renderer.Texture;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0; // Add this import statement
-import static org.lwjgl.opengl.GL13.glActiveTexture;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import renderer.Renderer;
 
 public abstract class Scene {
 
@@ -37,16 +25,9 @@ public abstract class Scene {
 
     private static Scene currentScene;
 
-    // protected Camera camera = null;
-
     protected List<GameObject> gameObjects = new ArrayList<GameObject>();
 
     public void init() {
-
-        // shader = new Shader("assets/shaders/default.glsl");
-        // this.camera = new Camera(new Vector2d(0, 0));
-        // shader.setCamera(this.camera);
-
         start();
     }
 
@@ -60,10 +41,6 @@ public abstract class Scene {
     public static Scene getCurrentScene() {
         return currentScene;
     }
-
-    // public Camera getCamera() {
-    // return camera;
-    // }
 
     public void addGameObject(GameObject go) {
         gameObjects.add(go);
@@ -101,7 +78,7 @@ public abstract class Scene {
     }
 
     public void update(float deltaTime) {
-        System.out.println("FPS: "+1/deltaTime);
+        // System.out.println("FPS: "+1/deltaTime);
         if (!isRunning) {
             isRunning = true;
         }
