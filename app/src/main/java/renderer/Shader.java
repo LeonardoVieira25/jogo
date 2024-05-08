@@ -5,10 +5,12 @@ import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL11.glDrawElements;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
 import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glBufferSubData;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
@@ -45,11 +47,10 @@ import java.nio.IntBuffer;
 import org.joml.Matrix4d;
 import org.lwjgl.BufferUtils;
 
-import jade.Camera;
+import jade.Window;
 import util.Time;
 
 public class Shader {
-    private Camera camera;
     private String filepath;
 
     private int vertexID;
@@ -60,19 +61,20 @@ public class Shader {
 
     private int vaoID, vboID, eboID;
 
-    private float[] vertexArray = {
-            // positions--------- colors----------------- uv coordinates
-            400.0f, 100.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1, 0, // Bottom right 0
-            100.0f, 400.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0, 1, // Top left 1
-            400.0f, 400.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1, 1, // Top right 2
-            100.0f, 100.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0, 0 // Bottom left 3
-    };
-    private int[] elementArray = {
-            2, 1, 0, // top right triangle
-            0, 1, 3 // bottom left triangle
-    };
+    // private float[] vertexArray = {
+    //         // positions--------- colors----------------- uv coordinates
+    //         400.0f, 100.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1, 0, // Bottom right 0
+    //         100.0f, 400.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0, 1, // Top left 1
+    //         400.0f, 400.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1, 1, // Top right 2
+    //         100.0f, 100.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0, 0 // Bottom left 3
+    // };
+    // private int[] elementArray = {
+    //         2, 1, 0, // top right triangle
+    //         0, 1, 3 // bottom left triangle
+    // };
 
     public Shader(String filepath) {
+        
         this.filepath = filepath;
 
         String source = readFile(filepath);
@@ -85,12 +87,13 @@ public class Shader {
 
         this.programID = createProgram();
 
-        sendBuffers();
+        // sendBuffers(vertexArray, elementArray);
     }
 
-    public void setCamera(Camera camera) {
-        this.camera = camera;
-    }
+    // public void setCamera(Camera camera) {
+    //     System.out.println("set camera");
+    //     this.camera = camera;
+    // }
 
     public int getShaderProgram() {
         return this.programID;
@@ -162,16 +165,15 @@ public class Shader {
         }
     }
 
-    public void sendBuffers() {
+    public void sendBuffers(float[] vertexArray, int[] elementArray) {
+        System.out.println("Upload de buffers");
+
         vaoID = glGenVertexArrays();
         glBindVertexArray(vaoID);
 
-        FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertexArray.length);
-        vertexBuffer.put(vertexArray).flip();
-
         vboID = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboID);
-        glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertexArray.length * Float.BYTES, GL_DYNAMIC_DRAW);
 
         IntBuffer elementBuffer = BufferUtils.createIntBuffer(elementArray.length);
         elementBuffer.put(elementArray).flip();
@@ -184,12 +186,8 @@ public class Shader {
         int colorSize = 4;
         int uvSize = 2;
 
-        // glVertexAttribPointer(0, 3, GL_FLOAT, false, 7 * Float.BYTES, 0);
         glVertexAttribPointer(0, positionsSize, GL_FLOAT, false, (positionsSize + colorSize + uvSize) * Float.BYTES, 0);
         glEnableVertexAttribArray(0);
-
-        // glVertexAttribPointer(1, 4, GL_FLOAT, false, 7 * Float.BYTES, 3 *
-        // Float.BYTES);
 
         glVertexAttribPointer(1, colorSize, GL_FLOAT, false, (positionsSize + colorSize + uvSize) * Float.BYTES,
                 positionsSize * Float.BYTES);
@@ -200,9 +198,13 @@ public class Shader {
         glEnableVertexAttribArray(2);
     }
 
-    public void render() {
-        uploadMatrix4f("uProjection", camera.getProjectionMatrix());
-        uploadMatrix4f("uView", camera.getViewMatrix());
+    public void render(float[] vertexArray, int nVertices) {
+        glBindBuffer(GL_ARRAY_BUFFER, vboID);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, vertexArray);
+        
+        use();
+        uploadMatrix4f("uProjection", Window.getCamera().getProjectionMatrix());
+        uploadMatrix4f("uView", Window.getCamera().getViewMatrix());
         uploadFloat("uTime", Time.getTime());
 
         glBindVertexArray(vaoID);
@@ -211,7 +213,7 @@ public class Shader {
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
 
-        glDrawElements(GL_TRIANGLES, elementArray.length, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, nVertices, GL_UNSIGNED_INT, 0);
 
         // Unbind everything
         glDisableVertexAttribArray(0);
@@ -238,7 +240,6 @@ public class Shader {
         use();
         glUniform1f(location, value);
     }
-
 
     public void uploadTexture(String name, int slot) {
         int location = glGetUniformLocation(this.programID, name);

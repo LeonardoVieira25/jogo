@@ -29,6 +29,7 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+import org.joml.Vector2d;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -46,11 +47,19 @@ public class Window {
 
     private static Scene currentScene;
 
+    private static Camera camera = new Camera(new Vector2d());
+    public static Camera getCamera() {
+        return camera;
+    }
     public static int getWidth() {
         return Window.get().width;
     }
     public static int getHeigth() {
         return Window.get().height;
+    }
+
+    public static Scene getCurrentScene() {
+        return Window.currentScene;
     }
 
     private Window() {
@@ -113,7 +122,7 @@ public class Window {
         glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
         glfwSetKeyCallback(glfwWindow, KeyEventListener::keyCallback);
 
-        glfwSwapInterval(1); // Enable v-sync
+        // glfwSwapInterval(1); // Enable v-sync ( limita o fps )
 
         glfwShowWindow(glfwWindow);
 
