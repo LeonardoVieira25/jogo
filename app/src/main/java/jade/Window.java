@@ -9,6 +9,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
+import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
@@ -29,7 +30,10 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+import java.nio.IntBuffer;
+
 import org.joml.Vector2d;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -48,18 +52,24 @@ public class Window {
     private static Scene currentScene;
 
     private static Camera camera = new Camera(new Vector2d());
+
     public static Camera getCamera() {
         return camera;
     }
+
+
     public static int getWidth() {
-        return Window.get().width;
-    }
-    public static int getHeigth() {
-        return Window.get().height;
+        IntBuffer widthBuffer = BufferUtils.createIntBuffer(1);
+        IntBuffer heightBuffer = BufferUtils.createIntBuffer(1);
+        glfwGetWindowSize(glfwWindow, widthBuffer, heightBuffer);
+        return widthBuffer.get(0);
     }
 
-    public static Scene getCurrentScene() {
-        return Window.currentScene;
+    public static int getHeight() {
+        IntBuffer widthBuffer = BufferUtils.createIntBuffer(1);
+        IntBuffer heightBuffer = BufferUtils.createIntBuffer(1);
+        glfwGetWindowSize(glfwWindow, widthBuffer, heightBuffer);
+        return heightBuffer.get(0);
     }
 
     private Window() {
@@ -90,6 +100,8 @@ public class Window {
         }
         Window.currentScene.init();
     }
+
+
 
     private void init() {
         // Setup an error callback
@@ -143,13 +155,12 @@ public class Window {
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
-            
             if (deltaTime >= 0) {
                 Window.currentScene.update((float) (deltaTime));
             }
-            
+
             glfwSwapBuffers(this.glfwWindow); // swap the color buffers
-            
+
             deltaTime = Time.getTime() - lastTime;
             lastTime = Time.getTime();
 

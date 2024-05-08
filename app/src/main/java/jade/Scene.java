@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import renderer.Renderer;
+import util.AssetPool;
 
 public abstract class Scene {
 
@@ -75,6 +76,12 @@ public abstract class Scene {
         state = -1;
         switchingScene = true;
         targetScene = index;
+    }
+
+    public void loadResources(){
+        AssetPool.getShader("assets/shaders/default.glsl");
+        AssetPool.getTexture("assets/sprites/capivara.png");
+        AssetPool.getTexture("assets/sprites/gato_de_terno.jpg");
     }
 
     public void update(float deltaTime) {

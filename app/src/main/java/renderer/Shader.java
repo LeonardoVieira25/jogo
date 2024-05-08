@@ -32,6 +32,7 @@ import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glShaderSource;
 import static org.lwjgl.opengl.GL20.glUniform1f;
 import static org.lwjgl.opengl.GL20.glUniform1i;
+import static org.lwjgl.opengl.GL20.glUniform1iv;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
@@ -62,19 +63,19 @@ public class Shader {
     private int vaoID, vboID, eboID;
 
     // private float[] vertexArray = {
-    //         // positions--------- colors----------------- uv coordinates
-    //         400.0f, 100.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1, 0, // Bottom right 0
-    //         100.0f, 400.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0, 1, // Top left 1
-    //         400.0f, 400.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1, 1, // Top right 2
-    //         100.0f, 100.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0, 0 // Bottom left 3
+    // // positions--------- colors----------------- uv coordinates
+    // 400.0f, 100.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1, 0, // Bottom right 0
+    // 100.0f, 400.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0, 1, // Top left 1
+    // 400.0f, 400.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1, 1, // Top right 2
+    // 100.0f, 100.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0, 0 // Bottom left 3
     // };
     // private int[] elementArray = {
-    //         2, 1, 0, // top right triangle
-    //         0, 1, 3 // bottom left triangle
+    // 2, 1, 0, // top right triangle
+    // 0, 1, 3 // bottom left triangle
     // };
 
     public Shader(String filepath) {
-        
+
         this.filepath = filepath;
 
         String source = readFile(filepath);
@@ -91,8 +92,8 @@ public class Shader {
     }
 
     // public void setCamera(Camera camera) {
-    //     System.out.println("set camera");
-    //     this.camera = camera;
+    // System.out.println("set camera");
+    // this.camera = camera;
     // }
 
     public int getShaderProgram() {
@@ -185,23 +186,30 @@ public class Shader {
         int positionsSize = 3;
         int colorSize = 4;
         int uvSize = 2;
+        int idSize = 1;
+        int vertexSizeBytes = (positionsSize + colorSize + uvSize + idSize) * Float.BYTES;
 
-        glVertexAttribPointer(0, positionsSize, GL_FLOAT, false, (positionsSize + colorSize + uvSize) * Float.BYTES, 0);
+        glVertexAttribPointer(0, positionsSize, GL_FLOAT, false, vertexSizeBytes, 0);
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, colorSize, GL_FLOAT, false, (positionsSize + colorSize + uvSize) * Float.BYTES,
-                positionsSize * Float.BYTES);
+        glVertexAttribPointer(
+                1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionsSize * Float.BYTES);
         glEnableVertexAttribArray(1);
 
-        glVertexAttribPointer(2, uvSize, GL_FLOAT, false, (positionsSize + colorSize + uvSize) * Float.BYTES,
-                (positionsSize + colorSize) * Float.BYTES);
+        glVertexAttribPointer(
+                2, uvSize, GL_FLOAT, false, vertexSizeBytes, (positionsSize + colorSize) * Float.BYTES);
         glEnableVertexAttribArray(2);
+
+        glVertexAttribPointer(
+                3, idSize, GL_FLOAT, false, vertexSizeBytes, (positionsSize + colorSize + uvSize) * Float.BYTES);
+        glEnableVertexAttribArray(3);
+
     }
 
     public void render(float[] vertexArray, int nVertices) {
         glBindBuffer(GL_ARRAY_BUFFER, vboID);
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertexArray);
-        
+
         use();
         uploadMatrix4f("uProjection", Window.getCamera().getProjectionMatrix());
         uploadMatrix4f("uView", Window.getCamera().getViewMatrix());
@@ -245,5 +253,11 @@ public class Shader {
         int location = glGetUniformLocation(this.programID, name);
         use();
         glUniform1i(location, slot);
+    }
+
+    public void uploadIntArray(String name, int[] array) {
+        int location = glGetUniformLocation(this.programID, name);
+        use();
+        glUniform1iv(location, array);
     }
 }

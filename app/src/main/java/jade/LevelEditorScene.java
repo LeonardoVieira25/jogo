@@ -14,30 +14,84 @@ public class LevelEditorScene extends Scene {
         Scene.sceneFillColor = new float[] { 0.0f, 0.0f, 1.0f, 0.0f };
         System.out.println("LevelEditorScene");
 
-        Window.getCamera().setPosition(new Vector2d(-100, -100));
+        Window.getCamera().setPosition(new Vector2d());
     }
 
     @Override
     public void init() {
 
-        System.out.println("Criando game objects: ======================================================");
-        for (int x = 0; x < 1; x++) {
-            for (int y = 0; y < 1; y++) {
+        int width = Window.getWidth();
+        int height = Window.getHeight();
 
-                GameObject newGameObject = new GameObject("Teste", new Transform(
-                        new Vector2f(x * 1, y * 1),
-                        new Vector2f(1, 1)));
-                newGameObject.addComponent(
-                        new SpriteRenderer("assets/sprites/gato_de_terno.jpg",
-                                new Vector4f(
-                                        x % 2 == 0 ? 1 : 0,
-                                        y % 2 == 0 ? 1 : 0,
-                                        1.0f,
-                                        1.0f)));
+        int w = 10;
+        int h = 10;
+        int gap = 0;
+
+        int cols = width / (w + gap);
+        int rows = height / (h + gap);
+
+        System.out.println("Criando game objects: ======================================================");
+        GameObject newGameObject;
+
+        for (int x = 0; x < cols; x++) {
+            for (int y = 0; y < rows; y++) {
+                newGameObject = new GameObject(
+                        (x + y) % 2 == 0 ? "capivara" : "gato_de_terno",
+                        new Transform(
+                                new Vector2f(x * (w + gap), y * (h + gap)),
+                                new Vector2f(w, h)));
+                if ((x + y) % 3 == 0) {
+                    newGameObject.addComponent(
+                            new SpriteRenderer(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f)));
+                } else {
+
+                    if ((x + y) % 2 == 0) {
+                        newGameObject.addComponent(
+                                new SpriteRenderer(
+                                        "assets/sprites/capivara.png",
+                                        new Vector4f(1.0f, 0.0f, 1.0f, 1.0f)));
+                    } else {
+                        newGameObject.addComponent(
+                                new SpriteRenderer(
+                                        "assets/sprites/gato_de_terno.jpg",
+                                        new Vector4f(0.0f, 1.0f, 1.0f, 1.0f)));
+                    }
+                }
+                // newGameObject.addComponent(
+                // new SpriteRenderer(
+                // (x + y) % 3 == 0 ? "assets/sprites/capivara.png" :
+                // "assets/sprites/gato_de_terno.jpg",
+                // // "assets/sprites/gato_de_terno.jpg",
+                // // "assets/sprites/capivara.png",
+                // new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
                 addGameObject(newGameObject);
             }
         }
+        ;
+        // newGameObject = new GameObject(
+        // "capivara",
+        // new Transform(
+        // new Vector2f(0, 0),
+        // new Vector2f(100, 100)));
+        // newGameObject.addComponent(
+        // new SpriteRenderer(
+        // // "assets/sprites/gato_de_terno.jpg",
+        // "assets/sprites/capivara.png",
+        // new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
+        // addGameObject(newGameObject);
+        // newGameObject = new GameObject(
+        // "gato_de_terno",
+        // new Transform(
+        // new Vector2f(105, 0),
+        // new Vector2f(100, 100)));
+        // newGameObject.addComponent(
+        // new SpriteRenderer(
+        // "assets/sprites/gato_de_terno.jpg",
+        // // "assets/sprites/capivara.png",
+        // new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
+        // addGameObject(newGameObject);
         System.out.println("fim. ======================================================");
+        System.out.println("GameObjects: " + gameObjects.size());
 
         super.init();
     }

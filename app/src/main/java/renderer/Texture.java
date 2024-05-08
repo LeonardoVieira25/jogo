@@ -14,18 +14,18 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
+import static org.lwjgl.stb.STBImage.stbi_image_free;
+import static org.lwjgl.stb.STBImage.stbi_load; // Import the stbi_load method
+import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
 
+import java.nio.ByteBuffer; // Import the ByteBuffer class
 import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
-import java.nio.ByteBuffer; // Import the ByteBuffer class
-
-import static org.lwjgl.stb.STBImage.stbi_image_free;
-import static org.lwjgl.stb.STBImage.stbi_load; // Import the stbi_load method
 
 public class Texture {
     private String path;
-    private int textureID;
+    private int textureID = -1;
 
     public Texture(String path) {
         this.path = path;
@@ -60,6 +60,7 @@ public class Texture {
         IntBuffer width = BufferUtils.createIntBuffer(1);
         IntBuffer height = BufferUtils.createIntBuffer(1);
         IntBuffer channels = BufferUtils.createIntBuffer(1); // ? rgb ou rgba
+        stbi_set_flip_vertically_on_load(true);
 
         ByteBuffer data = stbi_load(path, width, height, channels, 0);
 
@@ -95,12 +96,11 @@ public class Texture {
                     + "width: " + width.get(0) + "\n" + "height: " + height.get(0) + "\n");
         }
         stbi_image_free(data);
-
     }
 
-    public int getTextureID() {
-        return textureID;
-    }
+    // public int getTextureID() {
+    //     return textureID;
+    // }
     public String getPath() {
         return path;
     }

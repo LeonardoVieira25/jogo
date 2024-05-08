@@ -4,25 +4,29 @@ import org.joml.Vector4f;
 
 import jade.Component;
 import renderer.Texture;
+import util.AssetPool;
 
 public class SpriteRenderer extends Component {
     
     private Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     private Texture texture = null;
+
     private String texturePath = null;
 
     public String getTexturePath() {
         return texturePath;
     }
     public SpriteRenderer(String texturePath, Vector4f color) {
-        // System.out.println("SpriteRenderer created!");
+        this.texture = AssetPool.getTexture(texturePath);
         this.texturePath = texturePath;
         this.color = color;
     }
     public SpriteRenderer(String texturePath) {
-        // System.out.println("SpriteRenderer created!");
+        // this.texture = new Texture(texturePath);
+        this.texture = AssetPool.getTexture(texturePath);
         this.texturePath = texturePath;
+        this.color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
     }
     public SpriteRenderer(Vector4f color) {
         this.color = color;
