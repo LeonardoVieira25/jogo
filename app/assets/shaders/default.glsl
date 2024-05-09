@@ -31,11 +31,15 @@ in vec2 fUV;
 in float fTextureIndex;
 
 vec2 texSize = vec2(32.0, 32.0);
-vec2 pixelUV = floor(fUV * texSize + 1) / texSize;
+// vec2 pixelUV = floor(fUV * texSize + 1) / texSize;
+vec2 pixelUV = fUV;
+
 
 out vec4 color;
 
 void main() {
+    // color = vec4(fUV, 0.0, 1.0);
+
     if(fTextureIndex >= 0.0) {
         color = texture(texture_sampler[int(fTextureIndex)], pixelUV);
     } else {

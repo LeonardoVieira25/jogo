@@ -3,6 +3,7 @@ package renderer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Vector2f;
 import org.joml.Vector4f;
 
 import components.SpriteRenderer;
@@ -26,7 +27,7 @@ public class RendererBatch {
 
     private final int VERTEX_SIZE = POSITION_SIZE + COLOR_SIZE + UV_SIZE + TEXTURE_INDEX_SIZE;
 
-    private SpriteRenderer[] sprites;
+    private SpriteRenderer[] spriteRenderers;
     private int numSprites;
     private boolean hasRoom;
     private float[] vertices;
@@ -40,7 +41,7 @@ public class RendererBatch {
 
         this.shader = AssetPool.getShader("assets/shaders/default.glsl");
 
-        this.sprites = new SpriteRenderer[this.maxBatchSize];
+        this.spriteRenderers = new SpriteRenderer[this.maxBatchSize];
         this.vertices = new float[this.maxBatchSize * 4 * VERTEX_SIZE];
 
         this.numSprites = 0;
@@ -75,7 +76,7 @@ public class RendererBatch {
 
     public void addSprite(SpriteRenderer sprite) {
         int index = this.numSprites;
-        this.sprites[index] = sprite;
+        this.spriteRenderers[index] = sprite;
         this.numSprites++;
 
         if (sprite.getTexture() != null) {
@@ -83,6 +84,7 @@ public class RendererBatch {
                 textures.add(sprite.getTexture());
             }
         }
+        
 
         loadVertexProperties(index);
 
@@ -91,23 +93,32 @@ public class RendererBatch {
         }
     }
 
+    public boolean hasTextureRoom() {
+        return textures.size() < 8;
+    }
+    public boolean hasTexture(Texture texture) {
+        return textures.contains(texture);
+    }
+
     private void loadVertexProperties(int index) {
 
-        SpriteRenderer sprite = this.sprites[index];
+        SpriteRenderer spriteRenderer = this.spriteRenderers[index];
 
         int offset = index * 4 * VERTEX_SIZE;
 
-        Vector4f color = sprite.getColor();
+        Vector4f color = spriteRenderer.getColor();
 
         int textureIndex = -1;
-        if (sprite.getTexture() != null) {
+        if (spriteRenderer.getTexture() != null) {
             for (int i = 0; i < textures.size(); i++) {
-                if (textures.get(i) == sprite.getTexture()) {
+                if (textures.get(i) == spriteRenderer.getTexture()) {
                     textureIndex = i;
                     break;
                 }
             }
         }
+
+        float[][] texCoords = spriteRenderer.getSprite().getTexCoords();
 
         int[][] coisas = {
                 { 1, 0 },
@@ -115,17 +126,16 @@ public class RendererBatch {
                 { 1, 1 },
                 { 0, 0 }
         };
-
         float xAdd = 1.0f;
         float yAdd = 1.0f;
         for (int i = 0; i < 4; i++) {
             yAdd = coisas[i][0];
             xAdd = coisas[i][1];
 
-            this.vertices[offset + 0] = sprite.gameObject.transform.position.x
-                    + (xAdd * sprite.gameObject.transform.scale.x);
-            this.vertices[offset + 1] = sprite.gameObject.transform.position.y
-                    + (yAdd * sprite.gameObject.transform.scale.y);
+            this.vertices[offset + 0] = spriteRenderer.gameObject.transform.position.x
+                    + (xAdd * spriteRenderer.gameObject.transform.scale.x);
+            this.vertices[offset + 1] = spriteRenderer.gameObject.transform.position.y
+                    + (yAdd * spriteRenderer.gameObject.transform.scale.y);
 
             this.vertices[offset + 2] = 1.0f;
 
@@ -134,8 +144,8 @@ public class RendererBatch {
             this.vertices[offset + 5] = color.z;
             this.vertices[offset + 6] = color.w;
 
-            this.vertices[offset + 7] = coisas[i][1];
-            this.vertices[offset + 8] = coisas[i][0];
+            this.vertices[offset + 7] = texCoords[i][0];
+            this.vertices[offset + 8] = texCoords[i][1];
 
             this.vertices[offset + 9] = textureIndex;
 
@@ -150,6 +160,7 @@ public class RendererBatch {
     private boolean firstRender = true;
 
     public void render() {
+        loadVertexProperties(0);
         if (firstRender) {
             firstRender = false;
 

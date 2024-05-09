@@ -27,6 +27,8 @@ public class Texture {
     private String path;
     private int textureID = -1;
 
+    private int width, height;
+
     public Texture(String path) {
         this.path = path;
 
@@ -60,18 +62,21 @@ public class Texture {
         IntBuffer width = BufferUtils.createIntBuffer(1);
         IntBuffer height = BufferUtils.createIntBuffer(1);
         IntBuffer channels = BufferUtils.createIntBuffer(1); // ? rgb ou rgba
-        stbi_set_flip_vertically_on_load(true);
+        // stbi_set_flip_vertically_on_load(true);
 
         ByteBuffer data = stbi_load(path, width, height, channels, 0);
 
+        
         if (data != null) {
+            this.width = width.get();
+            this.height = height.get();
             if (channels.get(0) == 3) { //* RGB
                 glTexImage2D( // ? upload da textura para a gpu
                         GL_TEXTURE_2D,
                         0, // ? mipmap level?
                         GL_RGB, // ? formato da textura (estamos assumindo que é rgba)
-                        width.get(), // ? largura da textura
-                        height.get(), // ? altura da textura
+                        this.width, // ? largura da textura
+                        this.height, // ? altura da textura
                         0,
                         GL_RGB, // ? formato da textura
                         GL_UNSIGNED_BYTE, // ? tipo do buffer
@@ -81,8 +86,8 @@ public class Texture {
                         GL_TEXTURE_2D,
                         0, // ? mipmap level?
                         GL_RGBA, // ? formato da textura (estamos assumindo que é rgba)
-                        width.get(), // ? largura da textura
-                        height.get(), // ? altura da textura
+                        this.width, // ? largura da textura
+                        this.height, // ? altura da textura
                         0,
                         GL_RGBA, // ? formato da textura
                         GL_UNSIGNED_BYTE, // ? tipo do buffer
@@ -103,6 +108,13 @@ public class Texture {
     // }
     public String getPath() {
         return path;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+    public int getHeight() {
+        return height;
     }
 
     public void bind() {
