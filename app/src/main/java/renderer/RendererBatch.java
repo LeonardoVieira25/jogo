@@ -1,14 +1,33 @@
 package renderer;
 
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
+import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glBufferSubData;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joml.Vector2f;
 import org.joml.Vector4f;
 
 import components.SpriteRenderer;
+import jade.Window;
 import util.AssetPool;
-import static org.lwjgl.opengl.GL13.*;
 
 public class RendererBatch {
 
@@ -48,9 +67,7 @@ public class RendererBatch {
         this.hasRoom = true;
 
         textures = new ArrayList<>();
-    }
 
-    public void start() {
     }
 
     private int[] generateIndeces() {
@@ -84,7 +101,6 @@ public class RendererBatch {
                 textures.add(sprite.getTexture());
             }
         }
-        
 
         loadVertexProperties(index);
 
@@ -92,10 +108,15 @@ public class RendererBatch {
             this.hasRoom = false;
         }
     }
+   
+    public boolean hasRoom() {
+        return this.hasRoom;
+    }
 
     public boolean hasTextureRoom() {
         return textures.size() < 8;
     }
+
     public boolean hasTexture(Texture texture) {
         return textures.contains(texture);
     }
@@ -112,7 +133,7 @@ public class RendererBatch {
         if (spriteRenderer.getTexture() != null) {
             for (int i = 0; i < textures.size(); i++) {
                 if (textures.get(i) == spriteRenderer.getTexture()) {
-                    textureIndex = i;
+                    textureIndex = textures.size() - i - 1;
                     break;
                 }
             }
@@ -153,39 +174,89 @@ public class RendererBatch {
         }
     }
 
-    public boolean hasRoom() {
-        return this.hasRoom;
+    
+
+    private boolean hasDirty = false;
+
+    private int[] textureSlots = { 0, 1, 2, 3, 4, 5, 6, 7 };
+
+    private int vaoID, vboID, eboID;
+
+    public void start() {
+        vaoID = glGenVertexArrays();
+        glBindVertexArray(vaoID);
+
+        vboID = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vboID);
+        glBufferData(GL_ARRAY_BUFFER, this.vertices.length * Float.BYTES, GL_DYNAMIC_DRAW);
+
+        eboID = glGenBuffers();
+        int[] elementBuffer = generateIndeces();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL_STATIC_DRAW);
+
+        int vertexSizeBytes = (POSITION_SIZE + COLOR_SIZE + UV_SIZE + TEXTURE_INDEX_SIZE) * Float.BYTES;
+
+        glVertexAttribPointer(0, POSITION_SIZE, GL_FLOAT, false, vertexSizeBytes, 0);
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(
+                1, COLOR_SIZE, GL_FLOAT, false, vertexSizeBytes, POSITION_SIZE * Float.BYTES);
+        glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(
+                2, UV_SIZE, GL_FLOAT, false, vertexSizeBytes, (POSITION_SIZE + COLOR_SIZE) * Float.BYTES);
+        glEnableVertexAttribArray(2);
+
+        glVertexAttribPointer(
+                3, TEXTURE_INDEX_SIZE, GL_FLOAT, false, vertexSizeBytes,
+                (POSITION_SIZE + COLOR_SIZE + UV_SIZE) * Float.BYTES);
+        glEnableVertexAttribArray(3);
+
     }
 
-    private boolean firstRender = true;
-
     public void render() {
-        loadVertexProperties(0);
-        if (firstRender) {
-            firstRender = false;
-
-            // for (int i = 0; i < vertices.length && i < 90; i++) {
-            //     System.out.print(vertices[i] + " ");
-            //     if ((i + 1) % 10 == 0)
-            //         System.out.println("");
-            // }
-            // System.out.println("");
-
-            shader.sendBuffers(vertices, generateIndeces());
-            return;
+        hasDirty = false;
+        for (int i = 0; i < numSprites; i++) {
+            if (spriteRenderers[i].isDirty()) {
+                loadVertexProperties(i);
+                hasDirty = true;
+                spriteRenderers[i].setDirty(false);
+            }
         }
+        if (hasDirty) {
+            glBindBuffer(GL_ARRAY_BUFFER, vboID);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, this.vertices);
+        }
+
+        shader.use();
+
+        shader.uploadMatrix4f("uProjection", Window.getCamera().getProjectionMatrix());
+        shader.uploadMatrix4f("uView", Window.getCamera().getViewMatrix());
 
         for (int i = 0; i < textures.size(); i++) {
             glActiveTexture(GL_TEXTURE0 + i + 1);
             textures.get(i).bind();
         }
-        
-        shader.uploadIntArray("texture_sampler", new int[] { 0, 1, 2, 3, 4, 5, 6, 7 });
+        shader.uploadIntArray("texture_sampler", textureSlots);
+
+        glBindVertexArray(vaoID);
+
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+
+        glDrawElements(GL_TRIANGLES, this.numSprites * 6, GL_UNSIGNED_INT, 0);
+
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+
+        glBindVertexArray(0);
 
         for (int i = 0; i < textures.size(); i++) {
             textures.get(i).unbind();
         }
 
-        shader.render(this.vertices, numSprites * 6);
+        shader.detach();
+
     }
 }

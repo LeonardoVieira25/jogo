@@ -134,7 +134,7 @@ public class Window {
         glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
         glfwSetKeyCallback(glfwWindow, KeyEventListener::keyCallback);
 
-        glfwSwapInterval(1); // Enable v-sync ( limita o fps )
+        glfwSwapInterval(1); // Enable v-sync ( limita o fps ) se tirar a gpu vai pra 100%
 
         glfwShowWindow(glfwWindow);
 
