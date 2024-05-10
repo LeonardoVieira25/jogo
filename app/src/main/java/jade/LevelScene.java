@@ -21,13 +21,13 @@ public class LevelScene extends Scene {
     @Override
     public void init() {
         AssetPool.clear();
+        super.init();
 
-        spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste.png", 4, 4, 16);
+        spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste2.png", 4, 4, 16);
         spriteRenderer = new SpriteRenderer(spritesheet.getSprite(0));
 
         System.out.println(
                 "========================================== LevelScene init ==========================================");
-        super.init();
 
         Window.getCamera().setPosition(new Vector2d(100, 0));
         GameObject newGameObject = new GameObject("Teste", new Transform(

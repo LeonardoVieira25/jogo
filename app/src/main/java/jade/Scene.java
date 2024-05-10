@@ -29,6 +29,7 @@ public abstract class Scene {
     protected List<GameObject> gameObjects = new ArrayList<GameObject>();
 
     public void init() {
+        AssetPool.clear();
         start();
     }
 
