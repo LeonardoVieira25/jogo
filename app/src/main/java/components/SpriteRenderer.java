@@ -19,6 +19,14 @@ public class SpriteRenderer extends Component {
 
     private Transform lastTransform = null;
 
+    private int zIndex = 0;
+    public int getZIndex() {
+        return zIndex;
+    }
+    public void setZIndex(int zIndex) {
+        this.zIndex = zIndex;
+    }
+
     public boolean isDirty() {
         return isDirty;
     }
@@ -35,29 +43,20 @@ public class SpriteRenderer extends Component {
         return texturePath;
     }
 
-    public SpriteRenderer(String texturePath, Vector4f color) {
+    public SpriteRenderer(Sprite sprite, int zIndex) {
+        this.zIndex = zIndex;
         this.isDirty = true;
-        this.sprite = AssetPool.getSprite(texturePath);
-        this.texturePath = texturePath;
-        this.color = color;
-    }
-
-    public SpriteRenderer(String texturePath) {
-        this.isDirty = true;
-        this.sprite = AssetPool.getSprite(texturePath);
-        this.texturePath = texturePath;
+        this.sprite = sprite;
+        this.texturePath = sprite.getTexture().getPath();
         this.color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
     }
+    
 
     public SpriteRenderer(Sprite sprite) {
         this.isDirty = true;
         this.sprite = sprite;
         this.texturePath = sprite.getTexture().getPath();
         this.color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-    }
-
-    public SpriteRenderer(Vector4f color) {
-        this.color = color;
     }
 
     public Vector4f getColor() {

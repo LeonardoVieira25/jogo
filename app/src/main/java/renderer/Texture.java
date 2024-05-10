@@ -31,9 +31,12 @@ public class Texture {
 
     public Texture(String path) {
         this.path = path;
-
-        // ? gera uma textura na gpu
         textureID = glGenTextures();
+        uploadTextureToGPU();
+    }
+
+    public int uploadTextureToGPU() {
+        // ? gera uma textura na gpu
         glBindTexture(GL_TEXTURE_2D, textureID);
 
         glTexParameteri(
@@ -94,13 +97,14 @@ public class Texture {
             } else {
                 throw new RuntimeException("Error: (Texture) Sei la que textura é essa?: " + channels.get(0));
             }
-        System.out.println("Texture loaded: " + path + " " + textureID);
+            // System.out.println("Texture loaded: " + path + " " + textureID);
         } else {
             throw new RuntimeException("Error loading texture " + path + "\n"
                     + stbi_load(path, width, height, channels, 0) + "\n" + "channels: " + channels.get(0) + "\n"
                     + "width: " + width.get(0) + "\n" + "height: " + height.get(0) + "\n");
         }
         stbi_image_free(data);
+        return textureID;
     }
 
     public int getTextureID() {
