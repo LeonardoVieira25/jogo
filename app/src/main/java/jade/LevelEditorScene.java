@@ -35,15 +35,16 @@ public class LevelEditorScene extends Scene {
 
     @Override
     public void init() {
+        super.init();
+
         // int cols = width / (w + gap);
         // int rows = height / (h + gap);
 
         System.out.println("Criando game objects: ======================================================");
         GameObject newGameObject;
-
+        
         spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste.png", 4, 4, 16);
         playerSpriteRenderer = new SpriteRenderer(spritesheet.getSprite(0));
-
         newGameObject = new GameObject(
                 "player",
                 new Transform(
@@ -55,7 +56,7 @@ public class LevelEditorScene extends Scene {
 
         spritesheet2 = AssetPool.getSpritesheet("assets/sprites/capivara.png", 2, 2, 4);
         capivaraSpriteRenderer = new SpriteRenderer(spritesheet2.getSprite(2));
-        capivaraSpriteRenderer.setColor(new Vector4f(1.0f, 0.0f, 0.0f, 1.0f));
+        capivaraSpriteRenderer.setColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
         newGameObject = new GameObject(
                 "capivara",
@@ -68,7 +69,6 @@ public class LevelEditorScene extends Scene {
         System.out.println("fim. ======================================================");
         System.out.println("GameObjects: " + gameObjects.size());
 
-        super.init();
     }
 
     @Override
@@ -86,7 +86,7 @@ public class LevelEditorScene extends Scene {
 
         super.update(deltaTime);
 
-        if(MouseListener.isDragging()) {
+        if (MouseListener.isDragging()) {
             player.transform.position = Camera.getWorldMousePosition();
         }
 

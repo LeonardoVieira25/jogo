@@ -11,6 +11,7 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
@@ -65,11 +66,10 @@ public class Texture {
 
         ByteBuffer data = stbi_load(path, width, height, channels, 0);
 
-        
         if (data != null) {
             this.width = width.get();
             this.height = height.get();
-            if (channels.get(0) == 3) { //* RGB
+            if (channels.get(0) == 3) { // * RGB
                 glTexImage2D( // ? upload da textura para a gpu
                         GL_TEXTURE_2D,
                         0, // ? mipmap level?
@@ -80,7 +80,7 @@ public class Texture {
                         GL_RGB, // ? formato da textura
                         GL_UNSIGNED_BYTE, // ? tipo do buffer
                         data);
-            }else if (channels.get(0) == 4) { //* RGBA
+            } else if (channels.get(0) == 4) { // * RGBA
                 glTexImage2D( // ? upload da textura para a gpu
                         GL_TEXTURE_2D,
                         0, // ? mipmap level?
@@ -94,6 +94,7 @@ public class Texture {
             } else {
                 throw new RuntimeException("Error: (Texture) Sei la que textura é essa?: " + channels.get(0));
             }
+        System.out.println("Texture loaded: " + path + " " + textureID);
         } else {
             throw new RuntimeException("Error loading texture " + path + "\n"
                     + stbi_load(path, width, height, channels, 0) + "\n" + "channels: " + channels.get(0) + "\n"
@@ -102,9 +103,10 @@ public class Texture {
         stbi_image_free(data);
     }
 
-    // public int getTextureID() {
-    //     return textureID;
-    // }
+    public int getTextureID() {
+        return textureID;
+    }
+
     public String getPath() {
         return path;
     }
@@ -112,6 +114,7 @@ public class Texture {
     public int getWidth() {
         return width;
     }
+
     public int getHeight() {
         return height;
     }
@@ -122,5 +125,9 @@ public class Texture {
 
     public void unbind() {
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    public void cleanup() {
+        glDeleteTextures(textureID);
     }
 }

@@ -62,5 +62,17 @@ public class AssetPool{
         }
     }
 
+    public static void clear(){
+        System.out.println("Clearing AssetPool");
+        shaders.clear();
+        for (Texture texture : textures.values()){
+            texture.cleanup();
+        }
+        textures.clear();
+        sprites.clear();
+        spritesheets.clear();
+
+    }
+
     
 }

@@ -46,8 +46,8 @@ public abstract class Scene {
     public void addGameObject(GameObject go) {
         gameObjects.add(go);
         this.renderer.add(go);
-        go.start();
         if (isRunning) {
+            go.start();
         }
     }
 
@@ -55,6 +55,7 @@ public abstract class Scene {
         System.out.println("Start Scene");
         for (GameObject go : gameObjects) {
             go.start();
+            this.renderer.add(go);
         }
         this.isRunning = true;
     }
@@ -82,6 +83,7 @@ public abstract class Scene {
         AssetPool.getShader("assets/shaders/default.glsl");
         AssetPool.getTexture("assets/sprites/capivara.png");
         AssetPool.getTexture("assets/sprites/gato_de_terno.jpg");
+        AssetPool.getTexture("assets/sprites/spritesheetTeste.png");
     }
 
     public void update(float deltaTime) {

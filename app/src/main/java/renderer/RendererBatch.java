@@ -1,8 +1,10 @@
 package renderer;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glDrawElements;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
@@ -28,6 +30,7 @@ import org.joml.Vector4f;
 import components.SpriteRenderer;
 import jade.Window;
 import util.AssetPool;
+
 
 public class RendererBatch {
 
@@ -56,6 +59,8 @@ public class RendererBatch {
     private int maxBatchSize;
 
     public RendererBatch(int maxBatchSize) {
+        System.out.println("Creating RendererBatch: " + maxBatchSize + " sprites.");
+
         this.maxBatchSize = maxBatchSize;
 
         this.shader = AssetPool.getShader("assets/shaders/default.glsl");
@@ -100,6 +105,10 @@ public class RendererBatch {
             if (!textures.contains(sprite.getTexture())) {
                 textures.add(sprite.getTexture());
             }
+            // if (gpuIdToIndex.get(sprite.getTexture().getTextureID()) == null) {
+            //     textures.add(sprite.getTexture());
+            //     gpuIdToIndex.put(sprite.getTexture().getTextureID(), textures.size() - 1);
+            // }
         }
 
         loadVertexProperties(index);
@@ -131,12 +140,19 @@ public class RendererBatch {
 
         int textureIndex = -1;
         if (spriteRenderer.getTexture() != null) {
-            for (int i = 0; i < textures.size(); i++) {
-                if (textures.get(i) == spriteRenderer.getTexture()) {
-                    textureIndex = textures.size() - i - 1;
-                    break;
-                }
-            }
+            // if (gpuIdToIndex.get(spriteRenderer.getTexture().getTextureID()) != null) {
+            //     textureIndex = gpuIdToIndex.get(spriteRenderer.getTexture().getTextureID());
+            // }
+            textureIndex = spriteRenderer.getTexture().getTextureID();
+
+            // for (int i = 0; i < textures.size(); i++) {
+            //     if (textures.get(i) == spriteRenderer.getTexture()) {
+            //         System.out.println("Texture found: " + i);
+            //         System.out.println(textures.get(i).getPath() + " == " + spriteRenderer.getTexture().getPath());
+            //         textureIndex = textures.size() - i - 1;
+            //         break;
+            //     }
+            // }
         }
 
         float[][] texCoords = spriteRenderer.getSprite().getTexCoords();
@@ -236,7 +252,8 @@ public class RendererBatch {
 
         for (int i = 0; i < textures.size(); i++) {
             glActiveTexture(GL_TEXTURE0 + i + 1);
-            textures.get(i).bind();
+            // textures.get(i).bind();
+            glBindTexture(GL_TEXTURE_2D, textures.get(i).getTextureID());
         }
         shader.uploadIntArray("texture_sampler", textureSlots);
 

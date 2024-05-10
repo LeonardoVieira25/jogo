@@ -5,6 +5,7 @@ import org.joml.Vector2f;
 
 import components.SpriteRenderer;
 import components.Spritesheet;
+import util.AssetPool;
 
 public class LevelScene extends Scene {
 
@@ -14,29 +15,51 @@ public class LevelScene extends Scene {
         System.out.println("LevelScene");
     }
 
+    private Spritesheet spritesheet;
+    private SpriteRenderer spriteRenderer;
+
     @Override
     public void init() {
-        System.out.println("Criando game objects: ======================================================");
-        // for (int x = 0; x < 80; x++) {
-        // for (int y = 0; y < 40; y++) {
+        AssetPool.clear();
 
-        // GameObject newGameObject = new GameObject("Teste", new Transform(
-        // new Vector2f(100 + x * 11, 100 + y * 11),
-        // new Vector2f(10, 10)));
+        spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste.png", 4, 4, 16);
+        spriteRenderer = new SpriteRenderer(spritesheet.getSprite(0));
+
+        System.out.println(
+                "========================================== LevelScene init ==========================================");
+        super.init();
+
+        Window.getCamera().setPosition(new Vector2d(100, 0));
+        GameObject newGameObject = new GameObject("Teste", new Transform(
+                new Vector2f(200, 200),
+                new Vector2f(50, 50)));
+        newGameObject.addComponent(spriteRenderer);
+        addGameObject(newGameObject);
+
+        // newGameObject = new GameObject("Teste", new Transform(
+        //         new Vector2f(300, 200),
+        //         new Vector2f(50, 50)));
         // newGameObject.addComponent(spriteRenderer);
         // addGameObject(newGameObject);
-        // }
-        // }
-        System.out.println("fim. ======================================================");
-
-        super.init();
-        // camera.setPosition(new Vector2d(0.0f, 0.0f));
-        Window.getCamera().setPosition(new Vector2d(100, 0));
     }
-    private Spritesheet spritesheet = new Spritesheet("assets/sprites/gato_de_terno.jpg", 1, 1, 1);
+
+    float time = 0;
+    int counter = 0;
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
+        time += deltaTime;
+        if (time > 0.5) {
+            System.out.println("n de game objects: " + gameObjects.size() + " FPS: " + 1/deltaTime);
+            counter += 1;
+            if(counter > 15) counter = 0;
+
+            // spriteRenderer.setSprite(spritesheet.getSprite(counter));
+            for (GameObject go : gameObjects) {
+                go.getComponent(SpriteRenderer.class).setSprite(spritesheet.getSprite(counter));
+            }
+            time = 0;
+        }
 
         if (MouseListener.isMouseButtonDown(1)) {
             GameObject newGameObject = new GameObject("Teste", new Transform(
