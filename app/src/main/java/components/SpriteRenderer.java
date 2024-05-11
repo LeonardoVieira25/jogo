@@ -5,7 +5,6 @@ import org.joml.Vector4f;
 import jade.Component;
 import jade.Transform;
 import renderer.Texture;
-import util.AssetPool;
 
 public class SpriteRenderer extends Component {
 

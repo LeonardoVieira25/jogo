@@ -15,6 +15,7 @@ import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
+import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load; // Import the stbi_load method
 
@@ -97,6 +98,7 @@ public class Texture {
             } else {
                 throw new RuntimeException("Error: (Texture) Sei la que textura é essa?: " + channels.get(0));
             }
+            glGenerateMipmap(GL_TEXTURE_2D);
             // System.out.println("Texture loaded: " + path + " " + textureID);
         } else {
             throw new RuntimeException("Error loading texture " + path + "\n"

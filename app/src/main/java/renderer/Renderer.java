@@ -1,15 +1,15 @@
 package renderer;
 
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import components.SpriteRenderer;
 import jade.GameObject;
-import util.AssetPool;
-
-import java.util.ArrayList;
 
 public class Renderer {
-    private final int MAX_BATCH_SIZE = 100;
+    private final int MAX_BATCH_SIZE = 1000;
     private List<RendererBatch> batches;
     public static List<float[]> debugColors = new ArrayList<float[]>();
 
@@ -48,8 +48,7 @@ public class Renderer {
         }
         if (!added) {
             RendererBatch newRenderBatch = new RendererBatch(MAX_BATCH_SIZE, spriteRenderer.getZIndex()
-            // ,debugColors.get(
-            //                 (int) (Math.random() * debugColors.size()))
+            ,debugColors.get((int) (Math.random() * debugColors.size())) //! descometar essa linha para visualizar os batchs
                             );
 
             // RendererBatch newRenderBatch = new RendererBatch(MAX_BATCH_SIZE);
@@ -66,6 +65,8 @@ public class Renderer {
 
     public void render() {
         for (RendererBatch batch : batches) {
+            batch.getTexture().bind();
+            glActiveTexture(batch.getTexture().getTextureID());
             batch.render();
         }
     }

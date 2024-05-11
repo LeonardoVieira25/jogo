@@ -20,7 +20,6 @@ public class Spritesheet {
         this.sprites = new ArrayList<>();
 
         this.texture = AssetPool.getTexture(texturePath); // aqui que ta o pulo do gato
-        // this.texture = new Texture(texturePath);
 
         float textureWidth = this.texture.getWidth();
         float textureHeight = this.texture.getHeight();

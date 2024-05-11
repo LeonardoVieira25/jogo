@@ -3,7 +3,6 @@ package jade;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 
-import components.Sprite;
 import components.SpriteRenderer;
 import components.Spritesheet;
 import util.AssetPool;
@@ -27,12 +26,12 @@ public class LevelScene extends Scene {
         AssetPool.clear();
         super.init();
 
-        // spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste2.png", 4, 4, 16);
+        // spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste2.png",
+        // 4, 4, 16);
         spritesheet = new Spritesheet("assets/sprites/spriteseetTeste2.png", 4, 4, 16);
         spritesheet1 = new Spritesheet("assets/sprites/spriteseetTeste.png", 4, 4, 16);
         spritesheet2 = new Spritesheet("assets/sprites/capivara.png", 1, 1, 1);
         spritesheet3 = new Spritesheet("assets/sprites/gato_de_terno.jpg", 1, 1, 1);
-
 
         spriteRenderer = new SpriteRenderer(spritesheet.getSprite(0), 2);
 
@@ -47,53 +46,63 @@ public class LevelScene extends Scene {
         addGameObject(newGameObject);
 
         // newGameObject = new GameObject("Teste", new Transform(
-        //         new Vector2f(300, 200),
-        //         new Vector2f(50, 50)));
+        // new Vector2f(300, 200),
+        // new Vector2f(50, 50)));
         // newGameObject.addComponent(spriteRenderer);
         // addGameObject(newGameObject);
     }
 
-    private Spritesheet getRandomSprite() {
+
+    private class SpriteAndIndex {
+        public Spritesheet spritesheet;
+        public int index;
+    }
+    private SpriteAndIndex getRandomSpriteAndIndex() {
         int random = (int) (Math.random() * 4);
+        Spritesheet newSpritesheet = null;
+
         switch (random) {
             case 0:
-                return spritesheet;
+                newSpritesheet = spritesheet;
+                break;
             case 1:
-                return spritesheet1;
+                newSpritesheet = spritesheet1;
+                break;
             case 2:
-                return spritesheet2;
+                newSpritesheet = spritesheet2;
+                break;
             case 3:
-                return spritesheet3;
+                newSpritesheet = spritesheet3;
+                break;
             default:
-                return spritesheet;
+                newSpritesheet = spritesheet;
+                break;
         }
-
-        
+        SpriteAndIndex sai = new SpriteAndIndex();
+        sai.spritesheet = newSpritesheet;
+        sai.index = random;
+        return sai;
     }
 
     float time = 0;
-    int counter = 0;
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
         time += deltaTime;
         if (time > 0.5) {
-            System.out.println("n de game objects: " + gameObjects.size() + " FPS: " + 1/deltaTime);
-            counter += 1;
-            if(counter > 15) counter = 0;
+            System.out.println("n de game objects: " + gameObjects.size() + " FPS: " + 1 / deltaTime);
 
-            // spriteRenderer.setSprite(spritesheet.getSprite(counter));
-            // for (GameObject go : gameObjects) {
-            //     go.getComponent(SpriteRenderer.class).setSprite(spritesheet.getSprite(counter));
-            // }
             time = 0;
         }
 
         if (MouseListener.isMouseButtonDown(1)) {
             GameObject newGameObject = new GameObject("Teste", new Transform(
                     Camera.getWorldMousePosition(),
-                    new Vector2f(50, 50)));
-            newGameObject.addComponent(new SpriteRenderer(getRandomSprite().getSprite(0)));
+                    new Vector2f(
+                        (int) (Math.random() * 100) + 20, 
+                        (int) (Math.random() * 100) + 20)));
+            SpriteAndIndex sai = getRandomSpriteAndIndex();
+            newGameObject.addComponent(new SpriteRenderer(sai.spritesheet.getSprite(0), sai.index));
             addGameObject(newGameObject);
         }
 

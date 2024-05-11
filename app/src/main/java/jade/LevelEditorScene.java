@@ -45,17 +45,17 @@ public class LevelEditorScene extends Scene {
         GameObject newGameObject;
         // spritesheet2 = new Spritesheet("assets/sprites/capivara.png", 2, 2, 4);
 
-        // spritesheet2 = AssetPool.getSpritesheet("assets/sprites/capivara.png", 2, 2, 4);
-        // capivaraSpriteRenderer = new SpriteRenderer(spritesheet2.getSprite(2), 0);
-        // capivaraSpriteRenderer.setColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.f));
+        spritesheet2 = AssetPool.getSpritesheet("assets/sprites/capivara.png", 2, 2, 4);
+        capivaraSpriteRenderer = new SpriteRenderer(spritesheet2.getSprite(2), 0);
+        capivaraSpriteRenderer.setColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.f));
 
-        // newGameObject = new GameObject(
-        //         "capivara",
-        //         new Transform(
-        //                 new Vector2f(200, 0),
-        //                 new Vector2f(100, 100)));
-        // newGameObject.addComponent(capivaraSpriteRenderer);
-        // addGameObject(newGameObject);
+        newGameObject = new GameObject(
+                "capivara",
+                new Transform(
+                        new Vector2f(200, 0),
+                        new Vector2f(100, 100)));
+        newGameObject.addComponent(capivaraSpriteRenderer);
+        addGameObject(newGameObject);
         
         spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste.png", 4, 4, 16);
         // spritesheet = new Spritesheet("assets/sprites/spriteseetTeste2.png", 4, 4, 16);

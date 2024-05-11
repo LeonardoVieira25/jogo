@@ -1,13 +1,9 @@
 package renderer;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glDrawElements;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
 import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
@@ -130,17 +126,7 @@ public class RendererBatch {
         int index = this.numSprites;
         this.spriteRenderers[index] = sprite;
         this.numSprites++;
-
-        // if (sprite.getTexture() != null) {
-        //     if (!textures.contains(sprite.getTexture())) {
-        //         textures.add(sprite.getTexture());
-        //     }
-            // if (gpuIdToIndex.get(sprite.getTexture().getTextureID()) == null) {
-            //     textures.add(sprite.getTexture());
-            //     gpuIdToIndex.put(sprite.getTexture().getTextureID(), textures.size() - 1);
-            // }
-        // }
-
+        
         loadVertexProperties(index);
 
         if (this.numSprites >= this.maxBatchSize) {
@@ -159,14 +145,6 @@ public class RendererBatch {
         this.texture = texture;
     }
 
-    // public boolean hasTextureRoom() {
-    //     return textures.size() < 8;
-    // }
-
-    // public boolean hasTexture(Texture texture) {
-    //     return textures.contains(texture);
-    // }
-
     private void loadVertexProperties(int index) {
 
         SpriteRenderer spriteRenderer = this.spriteRenderers[index];
@@ -177,19 +155,7 @@ public class RendererBatch {
 
         int textureIndex = -1;
         if (spriteRenderer.getTexture() != null) {
-            // if (gpuIdToIndex.get(spriteRenderer.getTexture().getTextureID()) != null) {
-            //     textureIndex = gpuIdToIndex.get(spriteRenderer.getTexture().getTextureID());
-            // }
             textureIndex = spriteRenderer.getTexture().getTextureID();
-
-            // for (int i = 0; i < textures.size(); i++) {
-            //     if (textures.get(i) == spriteRenderer.getTexture()) {
-            //         System.out.println("Texture found: " + i);
-            //         System.out.println(textures.get(i).getPath() + " == " + spriteRenderer.getTexture().getPath());
-            //         textureIndex = textures.size() - i - 1;
-            //         break;
-            //     }
-            // }
         }
 
         float[][] texCoords = spriteRenderer.getSprite().getTexCoords();
@@ -238,8 +204,6 @@ public class RendererBatch {
 
     private boolean hasDirty = false;
 
-    private List<Integer> textureSlots = new ArrayList<>(9);
-
     private int vaoID, vboID, eboID;
 
     public void start() {
@@ -277,13 +241,6 @@ public class RendererBatch {
     }
 
     public void render() {
-        // for (Texture texture : textures) {
-        //     // shader.uploadTexture("sampler_texture", texture.getTextureID());
-        //     // texture.uploadTextureToGPU();
-        //     System.out.println("Texture: " + texture.getTextureID());
-        //     texture.bind();
-        // }
-
         hasDirty = false;
         for (int i = 0; i < numSprites; i++) {
             if (spriteRenderers[i].isDirty()) {
@@ -302,15 +259,6 @@ public class RendererBatch {
         shader.uploadMatrix4f("uProjection", Window.getCamera().getProjectionMatrix());
         shader.uploadMatrix4f("uView", Window.getCamera().getViewMatrix());
 
-        glActiveTexture(texture.getTextureID());
-        // for (int i = 0; i < textures.size(); i++) {
-            // glActiveTexture(GL_TEXTURE0 + i + 1);
-            // textures.get(i).bind();
-            // glBindTexture(GL_TEXTURE_2D, textures.get(i).getTextureID());
-            // textureSlots.add(textures.get(i).getTextureID());
-        // }
-
-        // shader.uploadIntArray("texture_sampler", textureSlots.stream().mapToInt(Integer::intValue).toArray());
 
         glBindVertexArray(vaoID);
 
