@@ -43,9 +43,11 @@ public class LevelEditorScene extends Scene {
         
         System.out.println("Criando game objects: ======================================================");
         GameObject newGameObject;
+        // spritesheet2 = new Spritesheet("assets/sprites/capivara.png", 2, 2, 4);
+
         spritesheet2 = AssetPool.getSpritesheet("assets/sprites/capivara.png", 2, 2, 4);
-        capivaraSpriteRenderer = new SpriteRenderer(spritesheet2.getSprite(2));
-        capivaraSpriteRenderer.setColor(new Vector4f(1.0f, 1.0f, 1.0f, 0.5f));
+        capivaraSpriteRenderer = new SpriteRenderer(spritesheet2.getSprite(2), 0);
+        capivaraSpriteRenderer.setColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.f));
 
         newGameObject = new GameObject(
                 "capivara",
@@ -55,9 +57,10 @@ public class LevelEditorScene extends Scene {
         newGameObject.addComponent(capivaraSpriteRenderer);
         addGameObject(newGameObject);
         
-        spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste2.png", 4, 4, 16);
-        playerSpriteRenderer = new SpriteRenderer(spritesheet.getSprite(0));
-        playerSpriteRenderer.setColor(new Vector4f(1.0f, 1.0f, 1.0f, 0.5f));
+        spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste.png", 4, 4, 16);
+        // spritesheet = new Spritesheet("assets/sprites/spriteseetTeste2.png", 4, 4, 16);
+        playerSpriteRenderer = new SpriteRenderer(spritesheet.getSprite(0), 2);
+        playerSpriteRenderer.setColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.f));
         newGameObject = new GameObject(
                 "player",
                 new Transform(

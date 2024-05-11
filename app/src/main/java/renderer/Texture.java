@@ -15,6 +15,7 @@ import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
+import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load; // Import the stbi_load method
 
@@ -31,9 +32,12 @@ public class Texture {
 
     public Texture(String path) {
         this.path = path;
-
-        // ? gera uma textura na gpu
         textureID = glGenTextures();
+        uploadTextureToGPU();
+    }
+
+    public int uploadTextureToGPU() {
+        // ? gera uma textura na gpu
         glBindTexture(GL_TEXTURE_2D, textureID);
 
         glTexParameteri(
@@ -94,13 +98,15 @@ public class Texture {
             } else {
                 throw new RuntimeException("Error: (Texture) Sei la que textura é essa?: " + channels.get(0));
             }
-        System.out.println("Texture loaded: " + path + " " + textureID);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            // System.out.println("Texture loaded: " + path + " " + textureID);
         } else {
             throw new RuntimeException("Error loading texture " + path + "\n"
                     + stbi_load(path, width, height, channels, 0) + "\n" + "channels: " + channels.get(0) + "\n"
                     + "width: " + width.get(0) + "\n" + "height: " + height.get(0) + "\n");
         }
         stbi_image_free(data);
+        return textureID;
     }
 
     public int getTextureID() {
