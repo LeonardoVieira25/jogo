@@ -40,9 +40,15 @@ import java.nio.IntBuffer;
 import org.joml.Vector2d;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.Version;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
+import imgui.ImGui;
+import imgui.ImGuiIO;
+import imgui.flag.ImGuiConfigFlags;
+import imgui.gl3.ImGuiImplGl3;
+import imgui.glfw.ImGuiImplGlfw;
 import util.Time;;
 
 public class Window {
@@ -58,10 +64,14 @@ public class Window {
 
     private static Camera camera = new Camera(new Vector2d());
 
+    private ImGuiLayer imGuiLayer;
+
+    private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
+    private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
+
     public static Camera getCamera() {
         return camera;
     }
-
 
     public static int getWidth() {
         IntBuffer widthBuffer = BufferUtils.createIntBuffer(1);
@@ -80,6 +90,7 @@ public class Window {
     private Window() {
         this.width = 800;
         this.height = 600;
+
     }
 
     public static Window get() {
@@ -106,11 +117,10 @@ public class Window {
         Window.currentScene.init();
     }
 
-
-
     private void init() {
         // Setup an error callback
         GLFWErrorCallback.createPrint(System.err).set();
+        
 
         // Initialize GLFW
         if (!glfwInit()) {
@@ -128,7 +138,7 @@ public class Window {
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(glfwWindow);
-        
+
         if (glfwWindow == NULL) {
             throw new IllegalStateException("Failed to create the GLFW window.");
         }
@@ -137,15 +147,23 @@ public class Window {
         glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
         glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
         glfwSetKeyCallback(glfwWindow, KeyEventListener::keyCallback);
-        
+
         glfwSwapInterval(0); // Enable v-sync ( limita o fps ) se tirar a gpu vai pra 100%
-        
+
         glfwShowWindow(glfwWindow);
-        
+
         GL.createCapabilities();
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        ImGui.createContext();
+
+        ImGuiIO io = ImGui.getIO();
+        io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
+
+        imGuiGlfw.init(glfwWindow, false);
+        imGuiGl3.init("#version 330 core");
 
         // Window.changeScene(0);
         Scene.start(0);
@@ -155,9 +173,16 @@ public class Window {
 
     @SuppressWarnings("static-access")
     private void loop() {
+        imGuiLayer = new ImGuiLayer();
+
+
+
         double lastTime = Time.getTime();
         double deltaTime = -1.0f;
+
         while (!glfwWindowShouldClose(this.glfwWindow)) {
+           
+
             glfwPollEvents();
 
             glClearColor(Window.fillColor[0], Window.fillColor[1], Window.fillColor[2], Window.fillColor[3]);
@@ -169,6 +194,22 @@ public class Window {
             }
 
             glfwSwapBuffers(this.glfwWindow); // swap the color buffers
+
+            imGuiGlfw.newFrame();
+            ImGui.newFrame();
+
+            imGuiLayer.imgui();
+
+            ImGui.render();
+            imGuiGl3.renderDrawData(ImGui.getDrawData());
+
+            if (ImGui.getIO().hasConfigFlags(ImGuiConfigFlags.ViewportsEnable)) {
+                final long backupWindowPtr = org.lwjgl.glfw.GLFW.glfwGetCurrentContext();
+                ImGui.updatePlatformWindows();
+                ImGui.renderPlatformWindowsDefault();
+                GLFW.glfwMakeContextCurrent(backupWindowPtr);
+            }
+
 
             deltaTime = Time.getTime() - lastTime;
             lastTime = Time.getTime();

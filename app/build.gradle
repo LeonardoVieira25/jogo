@@ -16,33 +16,50 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
+// dependencies {
+//     // Use JUnit Jupiter for testing.
+//     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
 
-    // This dependency is used by the application.
-    implementation 'com.google.guava:guava:31.1-jre'
-}
+//     // This dependency is used by the application.
+//     implementation 'com.google.guava:guava:31.1-jre'
+// }
 
 application {
     // Define the main class for the application.
     mainClass = 'Main'
+
+	mainClass = 'Main'
+    try {
+        if (libPath) {
+            applicationDefaultJvmArgs = ["-Dimgui.library.path=libs"]
+        }
+    } catch (ignored) {
+        // ignore
+    }
+}
+run {
+    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+        jvmArgs += ['-XstartOnFirstThread', '-Djava.awt.headless=true']
+    }
 }
 
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
+    // useJUnitPlatform()
 }
 
-project.ext.lwjglVersion = "3.2.3"
+
+project.ext.lwjglVersion = "3.3.3"
 project.ext.jomlVersion = "1.10.5"
 project.ext.lwjglNatives = "natives-windows"
 
-repositories {
-	mavenCentral()
-}
 
 dependencies {
+    // ImGUI stuff
+    // implementation fileTree('libs') { include '*.jar' }
+	implementation "io.github.spair:imgui-java-app:1.86.11"
+
+	// lwjgl stuff
 	implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
 	implementation "org.lwjgl:lwjgl"
