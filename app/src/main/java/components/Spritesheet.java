@@ -30,11 +30,9 @@ public class Spritesheet {
         int spriteWidth = (int) textureWidth / columns;
         int spriteHeight = (int) textureHeight / rows;
 
-        System.out.println("Sprite Width: " + spriteWidth);
-        System.out.println("Sprite Height: " + spriteHeight);
-
         int currentX = 0;
-        int currentY = (int) textureHeight - spriteHeight;
+        // int currentY = (int) textureHeight - spriteHeight;
+        int currentY = 0;
 
         for (int i = 0; i < numSprites; i++) {
             float[][] texCoords = {
@@ -49,7 +47,7 @@ public class Spritesheet {
             currentX += spriteWidth;
             if (currentX >= textureWidth) {
                 currentX = 0;
-                currentY -= spriteHeight;
+                currentY += spriteHeight;
             }
         }
 

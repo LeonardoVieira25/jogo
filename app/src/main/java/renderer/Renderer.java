@@ -48,7 +48,7 @@ public class Renderer {
         }
         if (!added) {
             RendererBatch newRenderBatch = new RendererBatch(MAX_BATCH_SIZE, spriteRenderer.getZIndex()
-            ,debugColors.get((int) (Math.random() * debugColors.size())) //! descometar essa linha para visualizar os batchs
+            // ,debugColors.get((int) (Math.random() * debugColors.size())) //! descometar essa linha para visualizar os batchs
                             );
 
             // RendererBatch newRenderBatch = new RendererBatch(MAX_BATCH_SIZE);

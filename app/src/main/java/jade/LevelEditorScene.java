@@ -14,9 +14,13 @@ import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
+import components.Sprite;
 import components.SpriteRenderer;
 import components.Spritesheet;
+import components.TextDisplay;
 import util.AssetPool;
+
+import java.util.List;
 
 public class LevelEditorScene extends Scene {
 
@@ -40,7 +44,7 @@ public class LevelEditorScene extends Scene {
 
         // int cols = width / (w + gap);
         // int rows = height / (h + gap);
-        
+
         System.out.println("Criando game objects: ======================================================");
         GameObject newGameObject;
         // spritesheet2 = new Spritesheet("assets/sprites/capivara.png", 2, 2, 4);
@@ -56,9 +60,10 @@ public class LevelEditorScene extends Scene {
                         new Vector2f(100, 100)));
         newGameObject.addComponent(capivaraSpriteRenderer);
         addGameObject(newGameObject);
-        
+
         spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste.png", 4, 4, 16);
-        // spritesheet = new Spritesheet("assets/sprites/spriteseetTeste2.png", 4, 4, 16);
+        // spritesheet = new Spritesheet("assets/sprites/spriteseetTeste2.png", 4, 4,
+        // 16);
         playerSpriteRenderer = new SpriteRenderer(spritesheet.getSprite(0), 2);
         playerSpriteRenderer.setColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.f));
         newGameObject = new GameObject(
@@ -70,6 +75,25 @@ public class LevelEditorScene extends Scene {
         player = newGameObject;
         addGameObject(newGameObject);
 
+
+        String text = "Esse aqui um texto que esta sento mostrado no jogo";
+        spritesheet = AssetPool.getSpritesheet("assets/sprites/fonte.png", 15, 8, 120);
+        // spritesheet = new Spritesheet("assets/sprites/spriteseetTeste2.png", 4, 4,
+        // 16);
+        TextDisplay textDisplay = new TextDisplay(text, spritesheet);
+        List<Sprite> sprites = textDisplay.getSprites();
+        for (int i = 0; i < sprites.size(); i++) {
+            newGameObject = new GameObject(
+                    "char" + i,
+                    new Transform(
+                            new Vector2f(
+                                    500 + i * 16,
+                                    Window.getHeight() / 2),
+                            new Vector2f(16, 16)));
+            newGameObject.addComponent(new SpriteRenderer(sprites.get(i), 10));
+            newGameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(1.0f, 1.0f, 0.0f, 1.f));
+            addGameObject(newGameObject);
+        }
 
         System.out.println("fim. ======================================================");
         System.out.println("GameObjects: " + gameObjects.size());
