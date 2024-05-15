@@ -3,6 +3,8 @@ package jade;
 import java.util.ArrayList;
 import java.util.List;
 
+import components.SpriteRenderer;
+
 public class GameObject {
     private String name;
     private List<Component> components = new ArrayList<Component>();
@@ -61,6 +63,15 @@ public class GameObject {
         for (Component component : components) {
             component.start();
         }
+    }
+
+    public List<SpriteRenderer> getSpriteRenderers() {
+        List<SpriteRenderer> spriteRenderers = new ArrayList<SpriteRenderer>();
+        SpriteRenderer sr = getComponent(SpriteRenderer.class);
+        if (sr != null) {
+            spriteRenderers.add(sr);
+        }
+        return spriteRenderers;
     }
     
 }

@@ -43,12 +43,26 @@ public abstract class Scene {
     public static Scene getCurrentScene() {
         return currentScene;
     }
-
+    public void addGameObject(List<GameObject> go) {
+        for (GameObject gameObject : go) {
+            addGameObject(gameObject);
+        }
+    }
     public void addGameObject(GameObject go) {
         gameObjects.add(go);
         this.renderer.add(go);
         if (isRunning) {
             go.start();
+        }
+    }
+
+    public void removeGameObject(GameObject go) {
+        gameObjects.remove(go);
+        this.renderer.remove(go);
+    }
+    public void removeGameObject(List<GameObject> go) {
+        for (GameObject gameObject : go) {
+            removeGameObject(gameObject);
         }
     }
 

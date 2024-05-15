@@ -27,7 +27,6 @@ import components.SpriteRenderer;
 import jade.Window;
 import util.AssetPool;
 
-
 public class RendererBatch {
 
     private List<Texture> textures;
@@ -64,7 +63,7 @@ public class RendererBatch {
         this.batchColor = batchColor;
 
         System.out.println("Creating RendererBatch: " + maxBatchSize + " sprites.");
-        
+
         this.zIndex = zIndex;
 
         this.maxBatchSize = maxBatchSize;
@@ -79,9 +78,10 @@ public class RendererBatch {
 
         textures = new ArrayList<>();
     }
+
     public RendererBatch(int maxBatchSize, int zIndex) {
         System.out.println("Creating RendererBatch: " + maxBatchSize + " sprites.");
-        
+
         this.zIndex = zIndex;
 
         this.maxBatchSize = maxBatchSize;
@@ -126,14 +126,41 @@ public class RendererBatch {
         int index = this.numSprites;
         this.spriteRenderers[index] = sprite;
         this.numSprites++;
-        
+
         loadVertexProperties(index);
 
         if (this.numSprites >= this.maxBatchSize) {
             this.hasRoom = false;
         }
     }
-   
+
+    public void removeSprite(SpriteRenderer sprite) {
+        int index = -1;
+        for (int i = 0; i < this.numSprites; i++) {
+            if (this.spriteRenderers[i] == sprite) {
+                index = i;
+                this.spriteRenderers[i] = null;
+                break;
+            }
+        }
+
+        if (index != -1) {
+            for (int i = index; i < this.numSprites - 1; i++) {
+                this.spriteRenderers[i] = this.spriteRenderers[i + 1];
+                this.spriteRenderers[i + 1] = null;
+            }
+            this.numSprites--;
+        }
+
+        if (this.numSprites < this.maxBatchSize) {
+            this.hasRoom = true;
+        }
+    }
+
+    public int getNumSprites() {
+        return this.numSprites;
+    }
+
     public boolean hasRoom() {
         return this.hasRoom;
     }
@@ -141,6 +168,7 @@ public class RendererBatch {
     public Texture getTexture() {
         return texture;
     }
+
     public void setTexture(Texture texture) {
         this.texture = texture;
     }
@@ -148,6 +176,10 @@ public class RendererBatch {
     private void loadVertexProperties(int index) {
 
         SpriteRenderer spriteRenderer = this.spriteRenderers[index];
+
+        if (spriteRenderer.transformScale == null) {
+            spriteRenderer.transformScale = spriteRenderer.gameObject.transform.scale;
+        }
 
         int offset = index * 4 * VERTEX_SIZE;
 
@@ -157,8 +189,6 @@ public class RendererBatch {
         if (spriteRenderer.getTexture() != null) {
             textureIndex = spriteRenderer.getTexture().getTextureID();
         }
-
-        float[][] texCoords = spriteRenderer.getSprite().getTexCoords();
 
         int[][] coisas = {
                 { 1, 0 },
@@ -172,11 +202,15 @@ public class RendererBatch {
             yAdd = coisas[i][0];
             xAdd = coisas[i][1];
 
-            this.vertices[offset + 0] = spriteRenderer.gameObject.transform.position.x
-                    + (xAdd * spriteRenderer.gameObject.transform.scale.x);
-            this.vertices[offset + 1] = spriteRenderer.gameObject.transform.position.y
-                    + (yAdd * spriteRenderer.gameObject.transform.scale.y);
+            this.vertices[offset + 0] =
+                spriteRenderer.gameObject.transform.position.x + spriteRenderer.transformOffset.x
+                    + (xAdd * spriteRenderer.transformScale.x);
 
+            this.vertices[offset + 1] = 
+                spriteRenderer.gameObject.transform.position.y + spriteRenderer.transformOffset.y
+                    + (yAdd * spriteRenderer.transformScale.y);
+            
+                    
             this.vertices[offset + 2] = 1.0f;
 
             if (batchColor != null) {
@@ -188,19 +222,22 @@ public class RendererBatch {
             this.vertices[offset + 5] = color.z;
             this.vertices[offset + 6] = color.w;
 
-            this.vertices[offset + 7] = texCoords[i][0];
-            this.vertices[offset + 8] = texCoords[i][1];
+            if (spriteRenderer.getSprite() != null) {
+                float[][] texCoords = spriteRenderer.getSprite().getTexCoords();
+                this.vertices[offset + 7] = texCoords[i][0];
+                this.vertices[offset + 8] = texCoords[i][1];
 
-            this.vertices[offset + 9] = textureIndex;
-            if (batchColor != null) {
+                this.vertices[offset + 9] = textureIndex;
+                if (batchColor != null) {
+                    this.vertices[offset + 9] = -1;
+                }
+            }else{
                 this.vertices[offset + 9] = -1;
             }
 
             offset += VERTEX_SIZE;
         }
     }
-
-    
 
     private boolean hasDirty = false;
 
@@ -258,7 +295,6 @@ public class RendererBatch {
 
         shader.uploadMatrix4f("uProjection", Window.getCamera().getProjectionMatrix());
         shader.uploadMatrix4f("uView", Window.getCamera().getViewMatrix());
-
 
         glBindVertexArray(vaoID);
 

@@ -23,10 +23,25 @@ public class Renderer {
         }
     }
 
+    public void add(List<GameObject> gameObjects) {
+        for (GameObject gameObject : gameObjects) {
+            add(gameObject);
+        }
+    }
+
+    // public void add(GameObject gameObject) {
+    // SpriteRenderer spriteRenderer =
+    // gameObject.getComponent(SpriteRenderer.class);
+    // if (spriteRenderer != null) {
+    // add(spriteRenderer);
+    // }
+    // }
     public void add(GameObject gameObject) {
-        SpriteRenderer spriteRenderer = gameObject.getComponent(SpriteRenderer.class);
-        if (spriteRenderer != null) {
-            add(spriteRenderer);
+        List<SpriteRenderer> spriteRenderers = gameObject.getSpriteRenderers();
+        if (spriteRenderers != null) {
+            for (SpriteRenderer spriteRenderer : spriteRenderers) {
+                add(spriteRenderer);
+            }
         }
     }
 
@@ -48,8 +63,9 @@ public class Renderer {
         }
         if (!added) {
             RendererBatch newRenderBatch = new RendererBatch(MAX_BATCH_SIZE, spriteRenderer.getZIndex()
-            // ,debugColors.get((int) (Math.random() * debugColors.size())) //! descometar essa linha para visualizar os batchs
-                            );
+            // ,debugColors.get((int) (Math.random() * debugColors.size())) //! descometar
+            // essa linha para visualizar os batchs
+            );
 
             // RendererBatch newRenderBatch = new RendererBatch(MAX_BATCH_SIZE);
             newRenderBatch.setTexture(spriteRenderer.getTexture());
@@ -58,8 +74,23 @@ public class Renderer {
             this.batches.add(newRenderBatch);
 
             this.batches.sort((RendererBatch a, RendererBatch b) -> {
-                return a.getZIndex() - b.getZIndex();
+                return b.getZIndex() - a.getZIndex();
             });
+        }
+    }
+
+    public void remove(GameObject gameObject) {
+        SpriteRenderer spriteRenderer = gameObject.getComponent(SpriteRenderer.class);
+        if (spriteRenderer != null) {
+            for (RendererBatch batch : batches) {
+                if (batch.getTexture() == spriteRenderer.getTexture()) {
+                    batch.removeSprite(spriteRenderer);
+                    if (batch.getNumSprites() == 0) {
+                        batches.remove(batch);
+                    }
+                    break;
+                }
+            }
         }
     }
 

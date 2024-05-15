@@ -14,13 +14,9 @@ import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
-import components.Sprite;
 import components.SpriteRenderer;
 import components.Spritesheet;
-import components.TextDisplay;
 import util.AssetPool;
-
-import java.util.List;
 
 public class LevelEditorScene extends Scene {
 
@@ -36,6 +32,8 @@ public class LevelEditorScene extends Scene {
     private SpriteRenderer playerSpriteRenderer = null;
     private SpriteRenderer capivaraSpriteRenderer = null;
     private GameObject player = null;
+
+    private TextDisplay fpsDisplay = null;
 
     @Override
     public void init() {
@@ -75,25 +73,19 @@ public class LevelEditorScene extends Scene {
         player = newGameObject;
         addGameObject(newGameObject);
 
-
-        String text = "Esse aqui um texto que esta sento mostrado no jogo";
+        String text = "O sistema de display de exibição de texto estático ja está funcionando! A quebra de linha é calculada de acordo com o tamanho do texto e do tamanho do display. É possível configurar o tamanho das letras, o espaçamento entre elas e o padding do display. O texto é exibido de acordo com a fonte carregada.\n Agora está faltando melhorar a interpretação de caracteres especiais e acentos. Depois disso será implementado um sistema de display de texto dinâmico. (  A minha ideia é criar uma lista de sprite renderers que será o maior tamanho possível do texto e ir trocando os sprites de acordo com o texto que será exibido )";
         spritesheet = AssetPool.getSpritesheet("assets/sprites/fonte.png", 15, 8, 120);
-        // spritesheet = new Spritesheet("assets/sprites/spriteseetTeste2.png", 4, 4,
-        // 16);
-        TextDisplay textDisplay = new TextDisplay(text, spritesheet);
-        List<Sprite> sprites = textDisplay.getSprites();
-        for (int i = 0; i < sprites.size(); i++) {
-            newGameObject = new GameObject(
-                    "char" + i,
-                    new Transform(
-                            new Vector2f(
-                                    500 + i * 16,
-                                    Window.getHeight() / 2),
-                            new Vector2f(16, 16)));
-            newGameObject.addComponent(new SpriteRenderer(sprites.get(i), 10));
-            newGameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(1.0f, 1.0f, 0.0f, 1.f));
-            addGameObject(newGameObject);
-        }
+        fpsDisplay = new TextDisplay(text, spritesheet, new Transform(
+                new Vector2f(200, 200),
+                new Vector2f(800, 400)),
+                20, 
+                25, 
+                -3,
+                10
+                );
+        fpsDisplay.setBackgroundColor(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
+                
+        addGameObject(fpsDisplay);
 
         System.out.println("fim. ======================================================");
         System.out.println("GameObjects: " + gameObjects.size());

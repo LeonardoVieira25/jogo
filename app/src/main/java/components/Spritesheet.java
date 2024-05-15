@@ -54,6 +54,9 @@ public class Spritesheet {
     }
 
     public Sprite getSprite(int index) {
+        if (index < 0 || index >= this.sprites.size()) {
+            return this.sprites.get(31);
+        }
         return this.sprites.get(index);
     }
 }
