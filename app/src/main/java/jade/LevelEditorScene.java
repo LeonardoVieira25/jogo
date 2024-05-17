@@ -20,6 +20,8 @@ import util.AssetPool;
 
 public class LevelEditorScene extends Scene {
 
+    private static final int GLFW_KEY_3 = 0;
+
     public LevelEditorScene() {
         Scene.sceneFillColor = new float[] { 0.0f, 0.0f, 1.0f, 0.0f };
         System.out.println("LevelEditorScene");
@@ -33,19 +35,10 @@ public class LevelEditorScene extends Scene {
     private SpriteRenderer capivaraSpriteRenderer = null;
     private GameObject player = null;
 
-    private TextDisplay fpsDisplay = null;
-
     @Override
     public void init() {
-        AssetPool.clear();
-        super.init();
-
-        // int cols = width / (w + gap);
-        // int rows = height / (h + gap);
-
         System.out.println("Criando game objects: ======================================================");
         GameObject newGameObject;
-        // spritesheet2 = new Spritesheet("assets/sprites/capivara.png", 2, 2, 4);
 
         spritesheet2 = AssetPool.getSpritesheet("assets/sprites/capivara.png", 2, 2, 4);
         capivaraSpriteRenderer = new SpriteRenderer(spritesheet2.getSprite(2), 0);
@@ -60,8 +53,6 @@ public class LevelEditorScene extends Scene {
         addGameObject(newGameObject);
 
         spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste.png", 4, 4, 16);
-        // spritesheet = new Spritesheet("assets/sprites/spriteseetTeste2.png", 4, 4,
-        // 16);
         playerSpriteRenderer = new SpriteRenderer(spritesheet.getSprite(0), 2);
         playerSpriteRenderer.setColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.f));
         newGameObject = new GameObject(
@@ -73,33 +64,16 @@ public class LevelEditorScene extends Scene {
         player = newGameObject;
         addGameObject(newGameObject);
 
-        String text = "O sistema de display de exibição de texto estático ja está funcionando! A quebra de linha é calculada de acordo com o tamanho do texto e do tamanho do display. É possível configurar o tamanho das letras, o espaçamento entre elas e o padding do display. O texto é exibido de acordo com a fonte carregada.\n Agora está faltando melhorar a interpretação de caracteres especiais e acentos. Depois disso será implementado um sistema de display de texto dinâmico. (  A minha ideia é criar uma lista de sprite renderers que será o maior tamanho possível do texto e ir trocando os sprites de acordo com o texto que será exibido )";
-        spritesheet = AssetPool.getSpritesheet("assets/sprites/fonte.png", 15, 8, 120);
-        fpsDisplay = new TextDisplay(text, spritesheet, new Transform(
-                new Vector2f(200, 200),
-                new Vector2f(800, 400)),
-                20, 
-                25, 
-                -3,
-                10
-                );
-        fpsDisplay.setBackgroundColor(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
-                
-        addGameObject(fpsDisplay);
-
         System.out.println("fim. ======================================================");
         System.out.println("GameObjects: " + gameObjects.size());
+
+        super.init();
 
     }
 
     @Override
     public void loadResources() {
         super.loadResources();
-        // AssetPool.getShader("assets/shaders/default.glsl");
-        // AssetPool.getTexture("assets/sprites/capivara.png");
-        // AssetPool.getTexture("assets/sprites/gato_de_terno.jpg");
-        // AssetPool.getSpritesheet("assets/sprites/capivara.png", 1, 1, 1);
-        // AssetPool.getSpritesheet("assets/sprites/gato_de_terno.jpg", 1, 1, 1);
     }
 
     @Override
@@ -136,7 +110,7 @@ public class LevelEditorScene extends Scene {
             playerSpriteRenderer.setSprite(spritesheet.getSprite(2));
             capivaraSpriteRenderer.setSprite(spritesheet2.getSprite(2));
         }
-        if (KeyEventListener.isKeyDown(GLFW_KEY_ENTER)) {
+        if (KeyEventListener.isKeyDown(GLFW_KEY_3)) {
             playerSpriteRenderer.setSprite(spritesheet.getSprite(3));
             capivaraSpriteRenderer.setSprite(spritesheet2.getSprite(3));
         }

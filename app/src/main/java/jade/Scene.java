@@ -3,6 +3,9 @@ package jade;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Vector2f;
+import org.joml.Vector4f;
+
 import renderer.Renderer;
 import util.AssetPool;
 
@@ -28,9 +31,41 @@ public abstract class Scene {
 
     protected List<GameObject> gameObjects = new ArrayList<GameObject>();
 
+    protected TextDisplay fpsDisplay;
+
     public void init() {
-        AssetPool.clear();
+        // AssetPool.clear();
+
         start();
+
+        // String text = "O sistema de display de exibição de texto estático ja está funcionando! A quebra de linha é calculada de acordo com o tamanho do texto e do tamanho do display. É possível configurar o tamanho das letras, o espaçamento entre elas e o padding do display. O texto é exibido de acordo com a fonte carregada.\n Agora está faltando melhorar a interpretação de caracteres especiais e acentos. Depois disso será implementado um sistema de display de texto dinâmico. (  A minha ideia é criar uma lista de sprite renderers que será o maior tamanho possível do texto e ir trocando os sprites de acordo com o texto que será exibido )";
+        // spritesheet = AssetPool.getSpritesheet("assets/sprites/fonte.png", 15, 8, 120);
+        // fpsDisplay = new TextDisplay(text, spritesheet, new Transform(
+        //         new Vector2f(200, 200),
+        //         new Vector2f(800, 400)),
+        //         20, 
+        //         25, 
+        //         -3,
+        //         10
+        //         );
+        // fpsDisplay.setBackgroundColor(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
+                
+        // addGameObject(fpsDisplay);
+
+
+        this.fpsDisplay = new TextDisplay(
+                "FPS: 0",
+                AssetPool.getSpritesheet("assets/sprites/fonte.png", 15, 8, 120),
+                new Transform(
+                        new Vector2f(10, 10),
+                        new Vector2f(200, 50)),
+                20,
+                25,
+                -3,
+                10);
+        this.fpsDisplay.setBackgroundColor(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
+        addGameObject(this.fpsDisplay);
+
     }
 
     public Scene() {
@@ -43,11 +78,13 @@ public abstract class Scene {
     public static Scene getCurrentScene() {
         return currentScene;
     }
+
     public void addGameObject(List<GameObject> go) {
         for (GameObject gameObject : go) {
             addGameObject(gameObject);
         }
     }
+
     public void addGameObject(GameObject go) {
         gameObjects.add(go);
         this.renderer.add(go);
@@ -60,6 +97,7 @@ public abstract class Scene {
         gameObjects.remove(go);
         this.renderer.remove(go);
     }
+
     public void removeGameObject(List<GameObject> go) {
         for (GameObject gameObject : go) {
             removeGameObject(gameObject);
@@ -94,17 +132,28 @@ public abstract class Scene {
         targetScene = index;
     }
 
-    public void loadResources(){
-        AssetPool.getShader("assets/shaders/default.glsl");
-        AssetPool.getTexture("assets/sprites/capivara.png");
-        AssetPool.getTexture("assets/sprites/gato_de_terno.jpg");
-        AssetPool.getTexture("assets/sprites/spritesheetTeste.png");
+    public void loadResources() {
+        // AssetPool.getShader("assets/shaders/default.glsl");
+        // AssetPool.getTexture("assets/sprites/capivara.png");
+        // AssetPool.getTexture("assets/sprites/gato_de_terno.jpg");
+        // AssetPool.getTexture("assets/sprites/spritesheetTeste.png");
     }
+
+    private float timeCounter = 0;
+    private int fpsCounter = 0;
 
     public void update(float deltaTime) {
         // System.out.println("FPS: "+1/deltaTime);
         if (!isRunning) {
             isRunning = true;
+        }
+
+        timeCounter += deltaTime;
+        fpsCounter += 1;
+        if (timeCounter > 1) {
+            fpsDisplay.setText("FPS: " + (int) (fpsCounter/timeCounter));
+            timeCounter = 0;
+            fpsCounter = 0;
         }
 
         this.renderer.render();

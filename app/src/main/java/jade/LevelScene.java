@@ -1,11 +1,9 @@
 package jade;
 
-import org.joml.Vector2d;
 import org.joml.Vector2f;
 
 import components.SpriteRenderer;
 import components.Spritesheet;
-import util.AssetPool;
 
 public class LevelScene extends Scene {
 
@@ -23,9 +21,6 @@ public class LevelScene extends Scene {
 
     @Override
     public void init() {
-        AssetPool.clear();
-        super.init();
-
         // spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste2.png",
         // 4, 4, 16);
         spritesheet = new Spritesheet("assets/sprites/spriteseetTeste2.png", 4, 4, 16);
@@ -38,7 +33,7 @@ public class LevelScene extends Scene {
         System.out.println(
                 "========================================== LevelScene init ==========================================");
 
-        Window.getCamera().setPosition(new Vector2d(100, 0));
+        // Window.getCamera().setPosition(new Vector2d(100, 0));
         GameObject newGameObject = new GameObject("Teste", new Transform(
                 new Vector2f(200, 200),
                 new Vector2f(50, 50)));
@@ -50,6 +45,7 @@ public class LevelScene extends Scene {
         // new Vector2f(50, 50)));
         // newGameObject.addComponent(spriteRenderer);
         // addGameObject(newGameObject);
+        super.init();
     }
 
 
