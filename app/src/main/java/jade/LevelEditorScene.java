@@ -3,6 +3,7 @@ package jade;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_0;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_1;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_2;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_3;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER;
@@ -20,7 +21,6 @@ import util.AssetPool;
 
 public class LevelEditorScene extends Scene {
 
-    private static final int GLFW_KEY_3 = 0;
 
     public LevelEditorScene() {
         Scene.sceneFillColor = new float[] { 0.0f, 0.0f, 1.0f, 0.0f };
@@ -52,7 +52,7 @@ public class LevelEditorScene extends Scene {
         newGameObject.addComponent(capivaraSpriteRenderer);
         addGameObject(newGameObject);
 
-        spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste.png", 4, 4, 16);
+        spritesheet = AssetPool.getSpritesheet("assets/sprites/spriteseetTeste2.png", 4, 4, 16);
         playerSpriteRenderer = new SpriteRenderer(spritesheet.getSprite(0), 2);
         playerSpriteRenderer.setColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.f));
         newGameObject = new GameObject(

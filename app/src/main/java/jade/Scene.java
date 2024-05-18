@@ -38,20 +38,28 @@ public abstract class Scene {
 
         start();
 
-        // String text = "O sistema de display de exibição de texto estático ja está funcionando! A quebra de linha é calculada de acordo com o tamanho do texto e do tamanho do display. É possível configurar o tamanho das letras, o espaçamento entre elas e o padding do display. O texto é exibido de acordo com a fonte carregada.\n Agora está faltando melhorar a interpretação de caracteres especiais e acentos. Depois disso será implementado um sistema de display de texto dinâmico. (  A minha ideia é criar uma lista de sprite renderers que será o maior tamanho possível do texto e ir trocando os sprites de acordo com o texto que será exibido )";
-        // spritesheet = AssetPool.getSpritesheet("assets/sprites/fonte.png", 15, 8, 120);
+        // String text = "O sistema de display de exibição de texto estático ja está
+        // funcionando! A quebra de linha é calculada de acordo com o tamanho do texto e
+        // do tamanho do display. É possível configurar o tamanho das letras, o
+        // espaçamento entre elas e o padding do display. O texto é exibido de acordo
+        // com a fonte carregada.\n Agora está faltando melhorar a interpretação de
+        // caracteres especiais e acentos. Depois disso será implementado um sistema de
+        // display de texto dinâmico. ( A minha ideia é criar uma lista de sprite
+        // renderers que será o maior tamanho possível do texto e ir trocando os sprites
+        // de acordo com o texto que será exibido )";
+        // spritesheet = AssetPool.getSpritesheet("assets/sprites/fonte.png", 15, 8,
+        // 120);
         // fpsDisplay = new TextDisplay(text, spritesheet, new Transform(
-        //         new Vector2f(200, 200),
-        //         new Vector2f(800, 400)),
-        //         20, 
-        //         25, 
-        //         -3,
-        //         10
-        //         );
+        // new Vector2f(200, 200),
+        // new Vector2f(800, 400)),
+        // 20,
+        // 25,
+        // -3,
+        // 10
+        // );
         // fpsDisplay.setBackgroundColor(new Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
-                
-        // addGameObject(fpsDisplay);
 
+        // addGameObject(fpsDisplay);
 
         this.fpsDisplay = new TextDisplay(
                 "FPS: 0",
@@ -87,15 +95,15 @@ public abstract class Scene {
 
     public void addGameObject(GameObject go) {
         gameObjects.add(go);
-        this.renderer.add(go);
         if (isRunning) {
+            this.renderer.add(go);
             go.start();
         }
     }
 
     public void removeGameObject(GameObject go) {
         gameObjects.remove(go);
-        this.renderer.remove(go);
+        // this.renderer.remove(go);
     }
 
     public void removeGameObject(List<GameObject> go) {
@@ -151,7 +159,7 @@ public abstract class Scene {
         timeCounter += deltaTime;
         fpsCounter += 1;
         if (timeCounter > 1) {
-            fpsDisplay.setText("FPS: " + (int) (fpsCounter/timeCounter));
+            fpsDisplay.setText("FPS: " + (int) (fpsCounter / timeCounter));
             timeCounter = 0;
             fpsCounter = 0;
         }
