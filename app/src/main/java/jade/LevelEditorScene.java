@@ -6,7 +6,6 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_2;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_3;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
@@ -20,7 +19,6 @@ import components.Spritesheet;
 import util.AssetPool;
 
 public class LevelEditorScene extends Scene {
-
 
     public LevelEditorScene() {
         Scene.sceneFillColor = new float[] { 0.0f, 0.0f, 1.0f, 0.0f };
@@ -40,9 +38,12 @@ public class LevelEditorScene extends Scene {
         System.out.println("Criando game objects: ======================================================");
         GameObject newGameObject;
 
-        spritesheet2 = AssetPool.getSpritesheet("assets/sprites/capivara.png", 2, 2, 4);
-        capivaraSpriteRenderer = new SpriteRenderer(spritesheet2.getSprite(2), 0);
-        capivaraSpriteRenderer.setColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.f));
+        // spritesheet2 = AssetPool.getSpritesheet("assets/sprites/capivara.png", 2, 2, 4);
+        capivaraSpriteRenderer = new SpriteRenderer(new Vector4f(
+            1.0f, 1.0f, 1.0f, 1.0f
+        ), -1);
+        // capivaraSpriteRenderer = new SpriteRenderer(spritesheet2.getSprite(2), 0);
+        // capivaraSpriteRenderer.setColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.f));
 
         newGameObject = new GameObject(
                 "capivara",
@@ -64,11 +65,25 @@ public class LevelEditorScene extends Scene {
         player = newGameObject;
         addGameObject(newGameObject);
 
-        System.out.println("fim. ======================================================");
-        System.out.println("GameObjects: " + gameObjects.size());
+        TextDisplay textDisplay = new TextDisplay(
+                "Essa e a tela de edicao de niveis.",
+                AssetPool.getSpritesheet("assets/sprites/fonte.png", 15, 8, 120),
+                new Transform(
+                        new Vector2f(10, 500),
+                        new Vector2f(1000, 70)),
+                20,
+                25,
+                -3,
+                20);
+                
+        textDisplay.setBackgroundColor(new Vector4f(0f, 0f, 0f, 0.8f));
+
+        addGameObject(textDisplay);
 
         super.init();
 
+        System.out.println("fim. ======================================================");
+        System.out.println("GameObjects: " + gameObjects.size());
     }
 
     @Override

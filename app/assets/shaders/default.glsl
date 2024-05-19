@@ -23,22 +23,16 @@ void main() {
 #type fragment
 #version 330 core
 
-// uniform sampler2D texture_sampler[8];
 uniform sampler2D texture_sampler;
 
 in vec4 fColor;
 in vec2 fUV;
 
-// vec2 texSize = vec2(4*16.0, 4*16.0);
-// vec2 pixelUV = floor(fUV * texSize + 1) / texSize;
 vec2 pixelUV = fUV;
 
 
 out vec4 color;
 
 void main() {
-
-    float isTexture = step(0.0, fUV.x) * step(0.0, fUV.y);
-    color = mix(fColor, texture(texture_sampler, pixelUV) * fColor, isTexture);
-
+    color = fColor * texture(texture_sampler, pixelUV);
 }

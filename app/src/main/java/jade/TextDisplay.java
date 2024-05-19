@@ -47,6 +47,7 @@ public class TextDisplay extends GameObject {
 
         backgroundRenderer = new SpriteRenderer(new Vector4f(1.0f, 1.0f, 1.0f, 0.2f), -10);
         backgroundRenderer.gameObject = this;
+        backgroundRenderer.setDirty(true);
         spriteRenderers.add(backgroundRenderer);
         
         this.backgroundOffsetIndex = spriteRenderers.size();

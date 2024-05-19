@@ -96,8 +96,9 @@ public class Renderer {
 
     public void render() {
         for (RendererBatch batch : batches) {
-            batch.getTexture().bind();
-            glActiveTexture(batch.getTexture().getTextureID());
+            Texture texture = batch.getTexture();
+            texture.bind();
+            glActiveTexture(texture.getTextureID());
             batch.render();
         }
     }

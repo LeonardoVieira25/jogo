@@ -6,6 +6,7 @@ import org.joml.Vector4f;
 import jade.Component;
 import jade.Transform;
 import renderer.Texture;
+import util.AssetPool;
 
 public class SpriteRenderer extends Component {
 
@@ -57,6 +58,9 @@ public class SpriteRenderer extends Component {
     public SpriteRenderer(Vector4f color, int zIndex) {
         this.zIndex = zIndex;
         this.isDirty = true;
+        
+        this.texturePath = "assets/sprites/blank.png";
+        this.sprite = new Sprite(AssetPool.getTexture(texturePath));
         this.color = color;
     }
     
